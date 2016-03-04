@@ -1,0 +1,14 @@
+## Interface: 60200
+## Title: |cffA02C2Fbd|rCore
+## Version: 0
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## SavedVariables: bdCoreData
+## SavedVariablesPerCharacter: bdCoreDataPerChar
+
+core.lua
+functions.lua
+auras.lua
+defaults.lua
+config.lua
+loading.lua
