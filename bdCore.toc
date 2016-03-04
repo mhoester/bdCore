@@ -10,5 +10,5 @@ core.lua
 functions.lua
 auras.lua
 defaults.lua
-config.lua
+config\config.lua
 loading.lua
