@@ -8,7 +8,6 @@ function bdCore:makeMovable(frame)
 	local height = frame:GetHeight()
 	local width = frame:GetWidth()
 	local point, relativeTo, relativePoint, xOfs, yOfs = frame:GetPoint()
-
 	local moveContainer = CreateFrame("frame", "bdCore_"..name, UIParent)
 	moveContainer.text = moveContainer:CreateFontString(moveContainer:GetName().."_Text")
 	moveContainer.frame = frame
@@ -17,7 +16,6 @@ function bdCore:makeMovable(frame)
 	moveContainer:SetBackdrop({bgFile = bdCore.media.flat})
 	moveContainer:SetBackdropColor(0,0,0,.6)
 	moveContainer:SetMovable(true)
-	moveContainer:SetUserPlaced(true)
 	moveContainer:SetFrameStrata("BACKGROUND")
 	moveContainer:SetClampedToScreen(true)
 	moveContainer:SetAlpha(0)
@@ -27,6 +25,11 @@ function bdCore:makeMovable(frame)
 		local width = frame:GetWidth()
 		moveContainer:SetSize(width+4, height+4)
 	end)
+	 
+	function moveContainer.dragStop(self)
+		self:StopMovingOrSizing()
+		c.sv.positions[self.frame:GetName()] = {self:GetPoint()}
+	end
 	
 	frame:ClearAllPoints()
 	frame:SetPoint("TOPRIGHT", moveContainer, "TOPRIGHT", -2, -2)
@@ -38,9 +41,9 @@ function bdCore:makeMovable(frame)
 	moveContainer.text:SetAlpha(0.8)
 	moveContainer.text:Hide()
 	
-	if (spawn) then
-		moveContainer:SetPoint(unpack(spawn))
-	elseif (point) then
+	if (c.sv.positions[name]) then
+		moveContainer:SetPoint(unpack(c.sv.positions[name]))
+	else
 		moveContainer:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
 	end
 	
@@ -48,14 +51,14 @@ function bdCore:makeMovable(frame)
 	return moveContainer
 end
 
+
+
 function bdCore:toggleLock()
-	local locked = true
+
 	if (bdCore.moving == true) then
-		locked = true
 		bdCore.moving = false
 		print(bdCore.colorString.."Core: Addons locked")
 	else
-		locked = false
 		bdCore.moving = true
 		print(bdCore.colorString.."Core: Addons unlocked")
 	end
@@ -63,16 +66,15 @@ function bdCore:toggleLock()
 
 	for k, v in pairs(bdCore.moveFrames) do
 		local frame = v
-		
-		if (locked == false) then
+		if (bdCore.moving) then
 			frame:SetAlpha(1)
 			frame.text:Show()
 			frame:EnableMouse(true)
 			frame:RegisterForDrag("LeftButton","RightButton")
 			frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
-			frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
-			frame:SetFrameStrata("HIGH")
-		elseif (locked == true) then
+			frame:SetScript("OnDragStop", function(self) self:dragStop(self) end)
+			frame:SetFrameStrata("TOOLTIP")
+		elseif (not bdCore.moving) then
 			frame:SetAlpha(0)
 			frame.text:Hide()
 			frame:EnableMouse(false)
@@ -134,6 +136,7 @@ end
 
 -- make it purdy
 function bdCore:setBackdrop(frame)
+	if (frame.background) then return false end
 	frame.background = CreateFrame('frame', nil, frame)
 	frame.background:SetBackdrop({
 		bgFile = bdCore.media.flat, 
@@ -145,9 +148,44 @@ function bdCore:setBackdrop(frame)
 	frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
 	frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
 	frame.background:SetFrameStrata(frame:GetFrameStrata())
-	frame.background:SetFrameLevel(frame:GetFrameLevel())
-	frame.background:SetFrameLevel(0)
-	frame:SetFrameLevel(1)
+	frame:SetFrameLevel(frame:GetFrameLevel()+1)
+	frame.background:SetFrameLevel(frame:GetFrameLevel()-1)
+end
+
+function bdCore:createShadow(f,offset)
+	if f.Shadow then return end
+	
+	local shadow = CreateFrame("Frame", nil, f)
+	shadow:SetFrameLevel(1)
+	shadow:SetFrameStrata(f:GetFrameStrata())
+	shadow:SetPoint("TOPLEFT", -offset, offset)
+	shadow:SetPoint("BOTTOMLEFT", -offset, -offset)
+	shadow:SetPoint("TOPRIGHT", offset, offset)
+	shadow:SetPoint("BOTTOMRIGHT", offset, -offset)
+	shadow:SetAlpha(0.7)
+	
+	shadow:SetBackdrop( { 
+		edgeFile = bdCore.media.shadow, edgeSize = offset,
+		insets = {left = offset, right = offset, top = offset, bottom = offset},
+	})
+	
+	shadow:SetBackdropColor(0, 0, 0, 0)
+	shadow:SetBackdropBorderColor(0, 0, 0, 0.8)
+	f.Shadow = shadow
+end
+
+-- not crazy about the built in split function
+function split(str, del)
+	local t = {}
+	local index = 0;
+	while (string.find(str, del)) do
+		local s, e = string.find(str, del)
+		t[index] = string.sub(str, 1, s-1)
+		str = string.sub(str, s+#del)
+		index = index + 1;
+	end
+	table.insert(t, str)
+	return t;
 end
 
 -- lua doesn't have a good function for round
@@ -185,6 +223,7 @@ function bdCore:kill(object)
 	end
 	object.Show = function() return end
 	object:Hide()
+	object = nil
 end
 
 -- set up slash commands
@@ -198,18 +237,14 @@ end
 
 -- filter debuffs/buffs
 function bdCore:filterAura(name,caster)
-	local my_class = string.lower(select(1, UnitClass('player')))
-	local spec_id = GetSpecialization()
-	local my_spec = string.lower(select(2,GetSpecializationInfo(spec_id)))
-	local my_role = string.lower(select(6,GetSpecializationInfo(spec_id)))
-
-	local blacklist = c.auras.blacklist
-	local whitelist = c.auras.whitelist
-	local raid = c.auras.raid
-	local mine = c.auras.mine
-	local class = c.auras.player_class[my_class]['all']
-	local spec = c.auras.player_class[my_class][my_spec] or {}
+	local blacklist = c.sv["Aura Blacklist"]["blacklist"]
+	local whitelist = c.sv["Aura Whitelist"]["whitelist"]
+	local mine = c.sv["Personal Auras"]["mine"]
+	local class = c.sv["Personal Auras"][bdCore.class]
 	
+	-- raid variables are set in a file, they can be blacklisted though, and added to through whitelist
+	local raid = bdCore.auras.raid
+
 	local allow = false
 	
 	if (blacklist[name] == true) then
@@ -224,8 +259,6 @@ function bdCore:filterAura(name,caster)
 		allow = true
 	elseif (class[name] == true) then
 		allow = true
-	elseif (spec[name] == true) then
-		allow = true
 	end
 	
 	return allow
@@ -235,14 +268,24 @@ bdCore:setSlashCommand('ReloadUI', ReloadUI, 'rl', 'reset')
 
 
 
-SLASH_BDCORE1, SLASH_BDCORE2 = "/bdcore"
+SLASH_BDCORE1, SLASH_BDCORE2 = "/bdcore", '/bd'
 SlashCmdList["BDCORE"] = function(msg, editbox)
 	if (msg == "" or msg == " ") then
 		print(bdCore.colorString.." Options:")
-		print("   "..bdCore.colorString.." lock - unlocks/locks moving bd addons")
+		print("   /"..bdCore.colorString.." lock - unlocks/locks moving bd addons")
+		print("   /"..bdCore.colorString.." config - opens the configuration for bd addons")
+		print("   /"..bdCore.colorString.." reset - reset the saved settings account-wide (careful)")
 		--print("-- /bui lock - locks the UI")
 	elseif (msg == "unlock" or msg == "lock") then
 		bdCore.toggleLock()
+	elseif (msg == "reset") then
+		bdCoreDataPerChar = nil
+		for k, frame in pairs(bdCore.moveFrames) do
+			frame:SetUserPlaced(false)
+		end
+		ReloadUI()
+	elseif (msg == "config") then
+		bdCore:toggleConfig()
 	else
 		print(bdCore.colorString.." "..msg.." not recognized as a command.")
 	end

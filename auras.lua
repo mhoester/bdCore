@@ -1,6 +1,6 @@
 local bdCore, c, f = select(2, ...):unpack()
-c.auras = {}
-c.auras.raid = {
+bdCore.auras = {}
+bdCore.auras.raid = {
 	----------------------------------------------------
 	-- Highmaul
 	----------------------------------------------------
@@ -134,10 +134,10 @@ c.auras.raid = {
 	----------------------------------------------------
 	-- Hellfire Citadel
 	----------------------------------------------------
-	['Devouring Spirit'] = true,
 	-- Assault
 	['Slam'] = true,
 	['Howling Axe'] = true,
+	['Conducted Shock Pulse'] = true,
 	
 	-- Iron Reaver
 	["Unstable Orb"] = true,
@@ -155,6 +155,7 @@ c.auras.raid = {
 	['Pool of Souls'] = true,
 	["Gorefiend's Corruption"] = true,
 	
+	
 	--Council
 	['Mark of the Necromancer'] = true,
 	['Bloodboil'] = true,
@@ -162,6 +163,8 @@ c.auras.raid = {
 	
 	-- Kormrok
 	["Fiery Burst"] = true,
+	["Crush"] = true,
+	["Foul Pool"] = true,
 	
 	-- Fel Lord Zakuun
 	['Latent Energy'] = true,
@@ -225,11 +228,18 @@ c.auras.raid = {
 	['Touch of the Legion'] = true, -- p3 knockback thing
 	
 	
-	-- 
+	-- Trash
+	['Cheap Shot'] = true,
+	['Ambush'] = true,
+	['Fel Blaze'] = true,
+	['Fel Fury'] = true,
+	['Devouring Spirit'] = true,
+	
+	-- Players
 	['Draenic Channeled Mana Potion'] = true,
 }
 
-c.auras.whitelist = {
+bdCore.auras.whitelist = {
 	-- Warriors
 	["Die by the Sword"] = true,
 	["Shield Wall"] = true,
@@ -303,7 +313,7 @@ c.auras.whitelist = {
 	["Spectral Guise"] = true,
 	["Pain Suppression"] = true,
 }
-c.auras.blacklist = {
+bdCore.auras.blacklist = {
 	-- paladins
 	["Illuminated Healing"] = true,
 	["Unyielding Faith"] = true,
@@ -329,7 +339,7 @@ c.auras.blacklist = {
 	["Sword and Board"] = true,
 	
 	-- Death Knights
-	"Purgatory",
+	["Purgatory"] = true,
 	
 	-- misc
 	["Honorless Target"] = true,
@@ -347,7 +357,6 @@ c.auras.blacklist = {
 	["Recently Mass Resurrected"] = true,
 	
 	
-	
 	-- Priests
 	["Weakened Soul"] = true,
 	
@@ -355,51 +364,43 @@ c.auras.blacklist = {
 	["Beacon's Tribute"] = true
 }
 
-c.auras.player_class = {
-	['preist'] = {
-		['all'] = {
-		
-		},
-		['discipline'] = {
-			["Weakened Soul"] = true,
-		}
+bdCore.auras.player_class = {
+	preist = {
+		["Weakened Soul"] = true,
 	},
-	['paladin'] = {
-		['all'] = {},
-		['holy'] = {},
-		['retribution'] = {},
-		['protection'] = {},
+	paladin = {
+
 	},
-	['deathknight'] = {
-		['all'] = {}
+	deathknight = {
+
 	},
-	['rogue'] = {
-		['all'] = {}
+	rogue = {
+
 	},
-	['shaman'] = {
-		['all'] = {}
+	shaman = {
+
 	},
-	['warlock'] = {
-		['all'] = {}
+	warlock = {
+
 	},
-	['mage'] = {
-		['all'] = {}
+	mage = {
+
 	},
-	['monk'] = {
-		['all'] = {}
+	monk = {
+
 	},
-	['hunter'] = {
-		['all'] = {}
+	hunter = {
+
 	},
-	['druid'] = {
-		['all'] = {}
+	druid = {
+
 	},
-	['warrior'] = {
-		['all'] = {}
+	warrior = {
+
 	}
 }
 
-c.auras.mine = {
+bdCore.auras.mine = {
 	["Lifebloom"] = true,
 	["Rejuvenation"] = true,
 	["Regrowth"] = true,

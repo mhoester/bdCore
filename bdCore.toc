@@ -4,11 +4,11 @@
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariables: bdCoreData
-## SavedVariablesPerCharacter: bdCoreDataPerChar
+## SavedVariables: bdCoreDataPerChar
 
 core.lua
 functions.lua
 auras.lua
-defaults.lua
+config\defaults.lua
 config\config.lua
 loading.lua

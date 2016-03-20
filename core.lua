@@ -5,7 +5,22 @@ engine[2] = {}
 engine[3] = {}
 
 engine[1]:RegisterEvent("ADDON_LOADED")
-engine[1].class = select(2, UnitClass("player")) 
+
+engine[1].class = string.lower(select(1, UnitClass('player')))
+
+local roleupdate = CreateFrame("frame",nil)
+roleupdate:RegisterEvent("LFG_ROLE_UPDATE")
+roleupdate:RegisterEvent("PLAYER_ROLES_ASSIGNED")
+roleupdate:RegisterEvent("ROLE_CHANGED_INFORM")
+roleupdate:RegisterEvent("PVP_ROLE_UPDATE")
+roleupdate:SetScript("OnEvent", function(self, event, arg)
+	local spec_id = GetSpecialization()
+	if (spec_id) then
+		engine[1].spec = string.lower(select(2,GetSpecializationInfo(spec_id)))
+		engine[1].role = string.lower(select(6,GetSpecializationInfo(spec_id)))
+	
+	end
+end)
 
 function engine:unpack()
 	return self[1], self[2], self[3]
