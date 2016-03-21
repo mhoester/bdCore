@@ -42,7 +42,7 @@ bdCore.whitelistconfig = {
 bdCore.blacklistconfig = {
 	[1] = {intro = {
 		type = "text",
-		value = "Add auras to the whitelist to have them hidden whenever possible, such as buffs or debuffs that you don't need to track.",
+		value = "Add auras to the blacklist to have them hidden whenever possible, such as buffs or debuffs that you don't need to track.",
 	}},
 	[2] = {blacklist = {
 		type = "list",
