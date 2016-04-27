@@ -3,7 +3,9 @@ local bdCore, c, f = select(2, ...):unpack()
 bdCore.moving = false
 bdCore.moveFrames = {}
 -- add to our movable list
-function bdCore:makeMovable(frame)
+function bdCore:makeMovable(frame,resize)
+	if not resize then resize = true end
+	local border = bdCore.config['General'].border
 	local name = frame:GetName();
 	local height = frame:GetHeight()
 	local width = frame:GetWidth()
@@ -12,6 +14,13 @@ function bdCore:makeMovable(frame)
 	moveContainer.text = moveContainer:CreateFontString(moveContainer:GetName().."_Text")
 	moveContainer.frame = frame
 	frame.moveContainer = moveContainer
+	if (resize) then
+		hooksecurefunc(frame,"SetSize",function() 
+			local height = frame:GetHeight()
+			local width = frame:GetWidth()
+			moveContainer:SetSize(width+2+border, height+2+border)
+		end)
+	end
 	moveContainer:SetSize(width+4, height+4)
 	moveContainer:SetBackdrop({bgFile = bdCore.media.flat})
 	moveContainer:SetBackdropColor(0,0,0,.6)
@@ -19,11 +28,11 @@ function bdCore:makeMovable(frame)
 	moveContainer:SetFrameStrata("BACKGROUND")
 	moveContainer:SetClampedToScreen(true)
 	moveContainer:SetAlpha(0)
-	bdCore:hookEvent("frames_resized", function()
-		local frame = self.frame
+	bdCore:hookEvent("frames_resized,bdcore_redraw", function()
+		local border = bdCore.config['General'].border
 		local height = frame:GetHeight()
 		local width = frame:GetWidth()
-		moveContainer:SetSize(width+4, height+4)
+		moveContainer:SetSize(width+border, height+border)
 	end)
 	 
 	function moveContainer.dragStop(self)
@@ -34,7 +43,7 @@ function bdCore:makeMovable(frame)
 	frame:ClearAllPoints()
 	frame:SetPoint("TOPRIGHT", moveContainer, "TOPRIGHT", -2, -2)
 	
-	moveContainer.text:SetFont(bdCore.media.font, 20)
+	moveContainer.text:SetFont(bdCore.media.font, 16)
 	moveContainer.text:SetPoint("CENTER", moveContainer, "CENTER", 0, 0)
 	moveContainer.text:SetText(name)
 	moveContainer.text:SetJustifyH("CENTER")
@@ -51,8 +60,6 @@ function bdCore:makeMovable(frame)
 	return moveContainer
 end
 
-
-
 function bdCore:toggleLock()
 
 	if (bdCore.moving == true) then
@@ -63,6 +70,7 @@ function bdCore:toggleLock()
 		print(bdCore.colorString.."Core: Addons unlocked")
 	end
 	
+	bdCore:triggerEvent("bd_toggle_lock")
 
 	for k, v in pairs(bdCore.moveFrames) do
 		local frame = v
@@ -91,18 +99,35 @@ end
 -- custom events/hooks
 bdCore.events = {}
 function bdCore:hookEvent(event, func)
-	if (not bdCore.events[event]) then
-		bdCore.events[event] = {}
+	local events = split(event,",") or {event}
+	for i = 1, #events do
+		e = events[i]
+		if (not bdCore.events[e]) then
+			bdCore.events[e] = {}
+		end
+		bdCore.events[e][#bdCore.events[e]+1] = func
 	end
-	bdCore.events[event][#bdCore.events[event]+1] = func
 end
 
-function bdCore:triggerEvent(event)
+function bdCore:triggerEvent(event,...)
 	if (bdCore.events[event]) then
 		for k, v in pairs(bdCore.events[event]) do
-			v()
+			v(...)
 		end
 	end
+end
+
+function bdCore:redraw()
+	bdCore:triggerEvent("bdcore_redraw")
+end
+
+--
+function bdCore:colorGradient(perc)
+	if perc > 1 then perc = 1 end
+
+	local segment, realperc = math.modf(perc*2)
+	r1, g1, b1, r2, g2, b2 = unpack({1, 0, 0,1, 1, 0,0, 1, 0,0, 0, 0}, (segment * 3) + 1)
+	return r1 + (r2-r1)*realperc, g1 + (g2-g1)*realperc, b1 + (b2-b1)*realperc
 end
 
 -- return class color
@@ -135,8 +160,9 @@ function bdCore:RGBToHex(r, g, b)
 end
 
 -- make it purdy
-function bdCore:setBackdrop(frame)
+function bdCore:setBackdrop(frame,resize)
 	if (frame.background) then return false end
+
 	frame.background = CreateFrame('frame', nil, frame)
 	frame.background:SetBackdrop({
 		bgFile = bdCore.media.flat, 
@@ -148,8 +174,34 @@ function bdCore:setBackdrop(frame)
 	frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
 	frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
 	frame.background:SetFrameStrata(frame:GetFrameStrata())
-	frame:SetFrameLevel(frame:GetFrameLevel()+1)
+	if (frame:GetFrameLevel() < 2) then
+		frame:SetFrameLevel(frame:GetFrameLevel() + 1)
+	end
 	frame.background:SetFrameLevel(frame:GetFrameLevel()-1)
+	if (resize ~= false) then
+		bdCore:hookEvent("bdcore_redraw",function()
+			local border = bdCore.config['General'].border or bdCore.general.border
+			
+			frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
+			frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
+				
+			if (border > 0) then
+				frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
+				frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
+				frame.background:SetBackdrop({
+					bgFile = bdCore.media.flat, 
+					edgeFile = bdCore.media.flat, edgeSize = border,
+					insets = { left = border, right = border, top = border, bottom = border }
+				})
+				frame.background:SetBackdropBorderColor(.06, .08, .09, 1)
+			else
+				frame.background:SetBackdrop({bgFile = bdCore.media.flat})
+			end
+			
+			frame.background:SetBackdropColor(.11,.15,.18, 1)
+			
+		end)
+	end
 end
 
 function bdCore:createShadow(f,offset)
@@ -174,6 +226,17 @@ function bdCore:createShadow(f,offset)
 	f.Shadow = shadow
 end
 
+-- also comma values
+function comma_value(amount)
+  local formatted = amount
+  while true do  
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end
 -- not crazy about the built in split function
 function split(str, del)
 	local t = {}
@@ -203,6 +266,8 @@ function in_table ( e, t )
 end
 
 -- kill textures
+
+--[[
 function bdCore:stripTextures(object, text)
 	for i = 1, object:GetNumRegions() do
 		local region = select(i, object:GetRegions())
@@ -224,7 +289,7 @@ function bdCore:kill(object)
 	object.Show = function() return end
 	object:Hide()
 	object = nil
-end
+end--]]
 
 -- set up slash commands
 function bdCore:setSlashCommand(name, func, ...)
@@ -262,6 +327,14 @@ function bdCore:filterAura(name,caster)
 	end
 	
 	return allow
+end
+
+function bdCore:addOption(name, opts, var)
+	local index = #var or 0
+	var[index] = var[index] or {}
+	var[index][name] = opts
+	
+	return var
 end
 
 bdCore:setSlashCommand('ReloadUI', ReloadUI, 'rl', 'reset')

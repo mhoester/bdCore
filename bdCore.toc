@@ -7,6 +7,13 @@
 ## SavedVariables: bdCoreDataPerChar
 
 core.lua
+
+lib\oUF\oUF.xml
+lib\absorbs.lua
+lib\range.lua
+lib\aurabars.lua
+
+api.lua
 functions.lua
 auras.lua
 config\defaults.lua

@@ -16,6 +16,7 @@ RAID_CLASS_COLORS = {
 
 bdCore.media = {
 	flat = "Interface\\Buttons\\WHITE8x8",
+	arial = "fonts\\ARIALN.ttf",
 	font = "Interface\\Addons\\bdCore\\media\\font.ttf",
 	arrow = "Interface\\Addons\\bdCore\\media\\arrow.blp",
 	arrowup = "Interface\\Addons\\bdCore\\media\\arrowup.blp",
@@ -25,8 +26,42 @@ bdCore.media = {
 	backdrop = {.11,.15,.18, 1},
 	red = {.62,.17,.18,1},
 	blue = {.2, .4, 0.8, 1},
+	green = {.1, .7, 0.3, 1},
 }
 
+<<<<<<< .mine
+
+-- if our font doesn't load for some reason, default to arial.
+-- local fonttest = bdCore:CreateFontString()
+-- fonttest:SetFont(bdCore.media.font,12)
+-- if (not fonttest:GetFont()) then
+	-- bdCore.media.font = bdCore.media.arial
+-- end
+
+bdCore.general = {}
+bdCore.general[#bdCore.general+1] = {border = {
+	type = "slider",
+	value = 2,
+	min = 0,
+	max = 2,
+	step = 1,
+	callback = function() bdCore:triggerEvent("bdcore_redraw") end
+}}
+
+||||||| .r4
+=======
+bdCore.generalconfig = {}
+bdCore.generalconfig[#bdCore.generalconfig+1] = {border = {
+	type = "slider",
+	label = "Border Width",
+	step = 1,
+	value = 2,
+	min = 0,
+	max = 4,
+	--callback = function() bdCore:redraw() end
+}}
+
+>>>>>>> .r5
 bdCore.whitelistconfig = {
 	[1] = {intro = {
 		type = "text",

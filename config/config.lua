@@ -5,6 +5,7 @@ local configdims = {
 	width = 400,
 	left_col = 140,
 	height = 430,
+	rightwidth = 210
 }
 
 local cfg = CreateFrame( "Frame", "bdCore config", UIParent)
@@ -84,6 +85,34 @@ cfg.header.reload.x:SetFont(media.font, 12)
 cfg.header.reload.x:SetText("Reload UI")
 cfg.header.reload.x:SetPoint("CENTER", cfg.header.reload, "CENTER", 1, 0)
 
+-- lock/unlock button
+cfg.header.lock = CreateFrame("Button", nil, cfg.header)
+cfg.header.lock:SetPoint("RIGHT", cfg.header.reload, "LEFT", -2 ,0)
+cfg.header.lock:SetSize(70, 28)
+cfg.header.lock:SetBackdrop({bgFile = media.flat})
+cfg.header.lock:SetBackdropColor(unpack(media.green))
+cfg.header.lock:SetAlpha(0.6)
+cfg.header.lock:EnableMouse(true)
+cfg.header.lock:SetScript("OnEnter", function()
+	cfg.header.lock:SetAlpha(1)
+end)
+cfg.header.lock:SetScript("OnLeave", function()
+	cfg.header.lock:SetAlpha(0.6)
+end)
+cfg.header.lock:SetScript("OnClick", function(self)
+	bdCore.toggleLock()
+	if (self.x:GetText() == "Lock") then
+		self.x:SetText("Unlock")
+	else
+		self.x:SetText("Lock")
+	end
+end)
+
+cfg.header.lock.x = cfg.header.lock:CreateFontString(nil)
+cfg.header.lock.x:SetFont(media.font, 12)
+cfg.header.lock.x:SetText("Unlock")
+cfg.header.lock.x:SetPoint("CENTER", cfg.header.lock, "CENTER", 1, 0)
+
 -- main window
 cfg.main = CreateFrame("frame",nil,cfg)
 cfg.main:SetPoint("TOPLEFT",cfg.header,"BOTTOMLEFT")
@@ -107,6 +136,11 @@ cfg.lastitem = false
 function bdCore:toggleConfig()
 	cfg:Show()
 	cfg.first.select()
+	if (bdCore.moving) then
+		cfg.header.lock.x:SetText("Lock")
+	else
+		cfg.header.lock.x:SetText("Unlock")
+	end
 end
 
 --bdCore:hookEvent("bdcore_loaded",function() bdCore:toggleConfig() end)
@@ -197,10 +231,10 @@ function bdCore:addModule(name,configs)
 	scrollframe.content = panel.content 
 	scrollframe:SetScrollChild(panel.content)
 	
-	panel.text = panel:CreateFontString(nil)
+	--[[panel.text = panel:CreateFontString(nil)
 	panel.text:SetFont(media.font, 14)
 	panel.text:SetText(name)
-	panel.text:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, 24)
+	panel.text:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, 24)--]]
 	
 	panel:SetScript("OnMouseWheel", function(self, delta)
 		self.scrollbar:SetValue(self.scrollbar:GetValue() - (delta*20))
@@ -213,20 +247,24 @@ function bdCore:addModule(name,configs)
 		local scrollheight = 0
 		
 		for i = 1, #configs do
-			local config = configs[i]
-			if (not c[name]) then c[name] = {} end
-			if (not c.sv[name]) then c.sv[name] = {} end
+			local conf = configs[i]
 			
-			for option, info in pairs(config) do
-				if (not c[name][option]) then c[name][option] = info['value'] end
-				if (not c.sv[name][option]) then c.sv[name][option] = info['value'] end
+			c[name] = c[name] or {}
+			c.sv[name] = c.sv[name] or {}
+			
+			for option, info in pairs(conf) do
+				
+				if (c.sv[name][option] == nil) then
+					c[name] = c[name] or {}
+					c.sv[name][option] = info['value']
+				end
 				
 				if (info.type == "slider") then
 					bdCore:createSlider(name, option, info)
-					scrollheight = scrollheight + 50
+					scrollheight = scrollheight + 54
 				elseif (info.type == "checkbox") then
 					bdCore:createCheckButton(name, option, info)
-					scrollheight = scrollheight + 50
+					scrollheight = scrollheight + 40
 				elseif (info.type == "dropdown") then
 					bdCore:createDropdown(name, option, info)
 					scrollheight = scrollheight + 70
@@ -275,9 +313,10 @@ function bdCore:createText(group, info)
 	if (not panel.lastFrame) then
 		text:SetPoint("TOPLEFT", panel, "TOPLEFT", 6, 0)
 	else
-		text:SetPoint("TOPLEFT", panel.lastFrame, "BOTTOMLEFT", 0, -50)
+		text:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -30)
 	end
 	panel.lastFrame = text
+	panel.lastFrame.type = "text"
 	
 	return text
 end
@@ -285,15 +324,16 @@ function bdCore:createList(group,option,info)
 	local panel = cfg.config[group].content
 	
 	local container = CreateFrame("frame",nil,panel)
-	container:SetSize(210,200)
+	container:SetSize(configdims.rightwidth,200)
 	bdCore:setBackdrop(container)
 	container.background:SetBackdropColor(.18,.22,.25,1)
 	if (not panel.lastFrame) then
 		container:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -30)
 	else
-		container:SetPoint("TOPLEFT", panel.lastFrame, "BOTTOMLEFT", 0, -70)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -70)
 	end
 	panel.lastFrame = container
+	panel.lastFrame.type = "list"
 	
 	--scrollframe 
 	local scrollframe = CreateFrame("ScrollFrame", nil, container) 
@@ -404,8 +444,10 @@ function bdCore:createList(group,option,info)
 	function container.addremove(value)
 		container.insert:AddHistoryLine(value)
 		if(c.sv[group][option][value]) then
+			c[group][option][value] = nil
 			c.sv[group][option][value] = nil
 		else
+			c[group][option][value] = true
 			c.sv[group][option][value] = true
 		end
 		container.populate()
@@ -424,15 +466,16 @@ function bdCore:createDropdown(group, option, info)
 	local items = info.options
 	local container = CreateFrame("Button", "bdCore_"..info.label, panel)
 	local dropdown = CreateFrame("Frame", "bdCore_"..info.label, panel)
-	container:SetWidth(200)
+	container:SetWidth(configdims.rightwidth-10)
 	container:SetHeight(20)
 	bdCore:setBackdrop(container)
 	if (not panel.lastFrame) then
 		container:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -30)
 	else
-		container:SetPoint("TOPLEFT", panel.lastFrame, "BOTTOMLEFT", 0, -50)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -50)
 	end
 	panel.lastFrame = container
+	panel.lastFrame.type = "dropdown"
 	
 	container.arrow = container:CreateTexture(nil,"OVERLAY")
 	container.arrow:SetTexture(media.arrowdown)
@@ -500,8 +543,8 @@ function bdCore:createDropdown(group, option, info)
 		end
 		
 		item:SetScript("OnClick", function(self)
-			c.sv[group][option] = self.label:GetText()
 			c[group][option] = self.label:GetText()
+			c.sv[group][option] = self.label:GetText()
 			
 			if (info.callback) then
 				info:callback()
@@ -520,15 +563,19 @@ end
 
 function bdCore:createSlider(group, option, info)
 	local panel = cfg.config[group].content
-	local slider = CreateFrame("Slider", "bdCore_"..info.label, panel, "OptionsSliderTemplate")
-	slider:SetWidth(200)
+	local container = CreateFrame("frame",nil,panel)
+	local slider = CreateFrame("Slider", "bdCore_"..option, panel, "OptionsSliderTemplate")
+	slider:SetWidth(configdims.rightwidth-20)
 	slider:SetHeight(14)
+	slider:SetPoint("CENTER",container,"CENTER")
+	container:SetSize(configdims.rightwidth-20, 34)
 	if (not panel.lastFrame) then
-		slider:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -20)
+		container:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -20)
 	else
-		slider:SetPoint("TOPLEFT", panel.lastFrame, "BOTTOMLEFT", 0, -40)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -20)
 	end
-	panel.lastFrame = slider
+	panel.lastFrame = container
+	panel.lastFrame.type = "slider"
 	
 	
 	slider:SetOrientation('HORIZONTAL')
@@ -558,14 +605,14 @@ function bdCore:createSlider(group, option, info)
 	slider:Show()
 	slider:SetScript("OnValueChanged", function(self)
 		local newval = round(slider:GetValue(), 1)
-		if (c[group][option] == newval) then -- throttle it changing on every pixel
+		if (c.sv[group][option] == newval) then -- throttle it changing on every pixel
 			return false
 		end
 		slider:SetValue(newval)
 		slider.value:SetText(newval)
 		
-		c.sv[group][option] = newval
 		c[group][option] = newval
+		c.sv[group][option] = newval
 		
 		if (info.callback) then
 			info:callback()
@@ -576,21 +623,28 @@ end
 
 function bdCore:createCheckButton(group, option, info)
 	local panel = cfg.config[group].content
-	local check = CreateFrame("CheckButton", "bdCore_"..info.label, panel, "ChatConfigCheckButtonTemplate")
+	local check = CreateFrame("CheckButton", "bdCore_"..option, panel, "ChatConfigCheckButtonTemplate")
+	local container = CreateFrame("frame",nil,panel)
+	container:SetSize(configdims.rightwidth, 20)
+	check:Point("LEFT", container, "LEFT", 0, 0)
 	
 	if (not panel.lastFrame) then
-		check:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, 0)
+		container:SetPoint("TOPLEFT", panel, "TOPLEFT", 0, 0)
 	else
-		check:SetPoint("TOPLEFT", panel.lastFrame, "BOTTOMLEFT", 0, -40)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -20)
 	end
-	panel.lastFrame = check
+	panel.lastFrame = container
+	panel.lastFrame.type = "check"
 	
-	_G[info.label.."Text"]:SetText(info.label)
+	_G[check:GetName().."Text"]:SetText(info.label)
+	_G[check:GetName().."Text"]:SetFont(bdCore.media.font, 14)
+	_G[check:GetName().."Text"]:ClearAllPoints()
+	_G[check:GetName().."Text"]:SetPoint("LEFT", check, "RIGHT", 2, 1)
 	check.tooltip = info.tooltip;
 	check:SetChecked(c.sv[group][option])
 	check:SetScript("OnClick", function(self)
-		c.sv[group][option] = self:GetChecked()
 		c[group][option] = self:GetChecked()
+		c.sv[group][option] = self:GetChecked()
 		
 		if (info.callback) then
 			info:callback(check)
