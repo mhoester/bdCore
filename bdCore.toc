@@ -1,21 +1,30 @@
-## Interface: 60200
+## Interface: 72000
 ## Title: |cffA02C2Fbd|rCore
 ## Version: 0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
+## SavedVariables: bdCoreNoReset
 ## SavedVariables: bdCoreData
 ## SavedVariables: bdCoreDataPerChar
+## SavedVariables: bdCoreProfiles
 
 core.lua
 
 lib\oUF\oUF.xml
 lib\absorbs.lua
-lib\range.lua
 lib\aurabars.lua
+lib\predict.lua
 
-api.lua
 functions.lua
+api.lua
 auras.lua
 config\defaults.lua
 config\config.lua
 loading.lua
+scripts\bigwigsskin.lua
+scripts\gmotd.lua
+scripts\errorblock.lua
+scripts\interrupted.lua
+scripts\doubleclickbo.lua
+scripts\fontchange.lua
+scripts\altpower.lua

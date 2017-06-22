@@ -1,0 +1,51 @@
+local media = bdCore.media
+
+bdCore:hookEvent("loaded_bdcore", function()
+	local powerbar = CreateFrame('StatusBar', 'bdCore Alt Power', UIParent)
+	powerbar:SetStatusBarTexture(media.flat)
+	powerbar:SetMinMaxValues(0,200)
+	powerbar:SetSize(200, 20)
+	powerbar:SetStatusBarColor(.2, .4, 0.8, 1)
+	powerbar:SetPoint("CENTER",UIParent,"CENTER", 0, 0)
+	powerbar:Show()
+	bdCore:setBackdrop(powerbar)
+	bdCore:makeMovable(powerbar)
+	
+	powerbar.text = powerbar:CreateFontString(nil,"OVERLAY")
+	powerbar.text:SetFont(media.font, 13, "THINOUTLINE")
+	powerbar.text:SetPoint("CENTER", powerbar, "CENTER")
+	powerbar.text:SetJustifyH("CENTER")
+
+	--Event handling
+	powerbar:RegisterEvent("UNIT_POWER")
+	powerbar:RegisterEvent("UNIT_POWER_BAR_SHOW")
+	powerbar:RegisterEvent("UNIT_POWER_BAR_HIDE")
+	powerbar:RegisterEvent("PLAYER_ENTERING_WORLD")
+	powerbar:SetScript("OnEvent", function(self, event, arg1)
+		if (not bdCore.config.General.alteratepowerbar) then 
+			PlayerPowerBarAlt:RegisterEvent("UNIT_POWER_BAR_SHOW")
+			PlayerPowerBarAlt:RegisterEvent("UNIT_POWER_BAR_HIDE")
+			PlayerPowerBarAlt:RegisterEvent("PLAYER_ENTERING_WORLD")
+			if (event == "UNIT_POWER_BAR_SHOW") then
+				PlayerPowerBarAlt:Show()
+			end
+			
+			return
+		end
+		PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_SHOW")
+		PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_HIDE")
+		PlayerPowerBarAlt:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		PlayerPowerBarAlt:Hide()
+		if UnitAlternatePowerInfo("player") or UnitAlternatePowerInfo("target") then
+			self:Show()
+			
+			self:SetMinMaxValues(0, UnitPowerMax("player", ALTERNATE_POWER_INDEX))
+			local power = UnitPower("player", ALTERNATE_POWER_INDEX)
+			local mpower = UnitPowerMax("player", ALTERNATE_POWER_INDEX)
+			self:SetValue(power)
+			self.text:SetText(power.."/"..mpower)
+		else
+			self:Hide()
+		end
+	end)
+end)

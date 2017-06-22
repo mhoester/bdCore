@@ -1,23 +1,11 @@
 local bdCore, c, f = select(2, ...):unpack()
 
-RAID_CLASS_COLORS = {
-    ["HUNTER"] = { r = 0.67, g = 0.83, b = 0.45, colorStr = "ffabd473" },
-    ["WARLOCK"] = { r = 0.58, g = 0.51, b = 0.79, colorStr = "ff9482c9" },
-    ["PRIEST"] = { r = 1.0, g = 1.0, b = 1.0, colorStr = "ffffffff" },
-    ["PALADIN"] = { r = 0.96, g = 0.55, b = 0.73, colorStr = "fff58cba" },
-    ["MAGE"] = { r = 0.41, g = 0.8, b = 0.94, colorStr = "ff69ccf0" },
-    ["ROGUE"] = { r = 1.0, g = 0.96, b = 0.41, colorStr = "fffff569" },
-    ["DRUID"] = { r = 1.0, g = 0.49, b = 0.04, colorStr = "ffff7d0a" },
-    ["SHAMAN"] = { r = 0.0, g = 0.44, b = 0.87, colorStr = "ff0070de" },
-    ["WARRIOR"] = { r = 0.78, g = 0.61, b = 0.43, colorStr = "ffc79c6e" },
-    ["DEATHKNIGHT"] = { r = 0.77, g = 0.12 , b = 0.23, colorStr = "ffc41f3b" },
-    ["MONK"] = { r = 0.0, g = 1.00 , b = 0.59, colorStr = "ff00ff96" },
-};
-
 bdCore.media = {
 	flat = "Interface\\Buttons\\WHITE8x8",
+	smooth = "Interface\\Addons\\bdCore\\media\\smooth.tga",
 	arial = "fonts\\ARIALN.ttf",
 	font = "Interface\\Addons\\bdCore\\media\\font.ttf",
+	bold = "Interface\\Addons\\bdCore\\media\\homizio_bold.ttf",
 	arrow = "Interface\\Addons\\bdCore\\media\\arrow.blp",
 	arrowup = "Interface\\Addons\\bdCore\\media\\arrowup.blp",
 	arrowdown = "Interface\\Addons\\bdCore\\media\\arrowdown.blp",
@@ -29,15 +17,6 @@ bdCore.media = {
 	green = {.1, .7, 0.3, 1},
 }
 
-<<<<<<< .mine
-
--- if our font doesn't load for some reason, default to arial.
--- local fonttest = bdCore:CreateFontString()
--- fonttest:SetFont(bdCore.media.font,12)
--- if (not fonttest:GetFont()) then
-	-- bdCore.media.font = bdCore.media.arial
--- end
-
 bdCore.general = {}
 bdCore.general[#bdCore.general+1] = {border = {
 	type = "slider",
@@ -45,23 +24,82 @@ bdCore.general[#bdCore.general+1] = {border = {
 	min = 0,
 	max = 2,
 	step = 1,
+	label = "Border Width",
 	callback = function() bdCore:triggerEvent("bdcore_redraw") end
 }}
 
-||||||| .r4
-=======
-bdCore.generalconfig = {}
-bdCore.generalconfig[#bdCore.generalconfig+1] = {border = {
-	type = "slider",
-	label = "Border Width",
-	step = 1,
-	value = 2,
-	min = 0,
-	max = 4,
-	--callback = function() bdCore:redraw() end
+bdCore.general[#bdCore.general+1] = {errorblock = {
+	type = "checkbox",
+	value = true,
+	label = "Block Red Error Text Spam",
+}}
+bdCore.general[#bdCore.general+1] = {changefonts = {
+	type = "checkbox",
+	value = true,
+	label = "Change UI Fonts",
+}}
+bdCore.general[#bdCore.general+1] = {interrupt = {
+	type = "checkbox",
+	value = true,
+	label = "Announce Interrupts",
+}}
+bdCore.general[#bdCore.general+1] = {doubleclickbo = {
+	type = "checkbox",
+	value = true,
+	label = "Double Click buyout",
+	tooltip = "When double clicking on an auction it will buyout.",
+}}
+bdCore.general[#bdCore.general+1] = {alteratepowerbar = {
+	type = "checkbox",
+	value = true,
+	label = "Use Alternate Power Bar",
 }}
 
->>>>>>> .r5
+bdCore.auraconfig = {}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
+	type="tab",
+	value="Whitelist"
+}}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {whitelist = {
+	type = "list",
+	value = bdCore.auras.whitelist,
+	label = "Whitelisted Auras",
+}}
+
+-- Mine
+bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
+	type="tab",
+	value="My Casts"
+}}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {mine = {
+	type = "list",
+	value = bdCore.auras.mine,
+	label = "Auras Cast by Me",
+}}
+
+-- Class
+bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
+	type="tab",
+	value="All "..bdCore.class.." Auras"
+}}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {[bdCore.class] = {
+	type = "list",
+	value = bdCore.auras['Personal Auras'][bdCore.class],
+	label = 'All '..bdCore.class.." Auras",
+}}
+
+-- Blacklist
+bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
+	type="tab",
+	value="Blacklist"
+}}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {blacklist = {
+	type = "list",
+	value = bdCore.auras.whitelist,
+	label = "Blacklisted Auras",
+}}
+
+--[[
 bdCore.whitelistconfig = {
 	[1] = {intro = {
 		type = "text",
@@ -98,9 +136,9 @@ bdCore.personalconfig = {
 	}},
 	[3] = {[bdCore.class] = {
 		type = "list",
-		value = bdCore.auras.player_class[bdCore.class],
+		value = bdCore.auras['Personal Auras'][bdCore.class],
 		label = 'All '..bdCore.class.." Auras",
 	}},
 }
-
+--]]
 -- modules defaults

@@ -95,6 +95,48 @@ function bdCore:toggleLock()
 end
 
 
+function bdCore:skinButton(f,small,color)
+	local colors = bdCore.media.backdrop
+	local hovercolors = {0,0.55,.85,1}
+	if (color == "red") then
+		colors = {.6,.1,.1,0.6}
+		hovercolors = {.6,.1,.1,1}
+	elseif (color == "blue") then
+		colors = {0,0.55,.85,0.6}
+		hovercolors = {0,0.55,.85,1}
+	elseif (color == "dark") then
+		colors = bdCore.backdrop
+		hovercolors = {.1,.1,.1,1}
+	end
+	f:SetBackdrop({bgFile = "Interface\\Buttons\\WHITE8x8", edgeFile = "Interface\\Buttons\\WHITE8x8", edgeSize = 2, insets = {left=2,top=2,right=2,bottom=2}})
+	f:SetBackdropColor(unpack(colors)) 
+    f:SetBackdropBorderColor(unpack(bdCore.media.border))
+    f:SetNormalFontObject("bdCore.font")
+	f:SetHighlightFontObject("bdCore.font")
+	f:SetPushedTextOffset(0,-1)
+	
+	f:SetSize(f:GetTextWidth()+16,24)
+	
+	--if (f:GetWidth() < 24) then
+	if (small and f:GetWidth() <= 24 ) then
+		f:SetWidth(20)
+	end
+	
+	if (small) then
+		f:SetHeight(18)
+	end
+	
+	f:HookScript("OnEnter", function(f) 
+		f:SetBackdropColor(unpack(hovercolors)) 
+	end)
+	f:HookScript("OnLeave", function(f) 
+		f:SetBackdropColor(unpack(colors)) 
+	end)
+	
+	return true
+end
+
+
 
 -- custom events/hooks
 bdCore.events = {}
@@ -162,44 +204,24 @@ end
 -- make it purdy
 function bdCore:setBackdrop(frame,resize)
 	if (frame.background) then return false end
-
-	frame.background = CreateFrame('frame', nil, frame)
-	frame.background:SetBackdrop({
-		bgFile = bdCore.media.flat, 
-		edgeFile = bdCore.media.flat, edgeSize = 2,
-		insets = { left = 2, right = 2, top = 2, bottom = 2 }
-	})
-	frame.background:SetBackdropColor(.11,.15,.18, 1)
-	frame.background:SetBackdropBorderColor(.06, .08, .09, 1)
-	frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
-	frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
-	frame.background:SetFrameStrata(frame:GetFrameStrata())
-	if (frame:GetFrameLevel() < 2) then
-		frame:SetFrameLevel(frame:GetFrameLevel() + 1)
-	end
-	frame.background:SetFrameLevel(frame:GetFrameLevel()-1)
+	
+	frame.background = frame:CreateTexture(nil, "BACKGROUND", nil, -7)
+	frame.background:SetTexture(bdCore.media.flat)
+	frame.background:SetAllPoints(frame)
+	frame.background:SetVertexColor(unpack(bdCore.media.backdrop))
+	
+	frame.border = frame:CreateTexture(nil, "BACKGROUND", nil, -8)
+	frame.border:SetTexture(bdCore.media.flat)
+	frame.border:SetPoint("TOPLEFT", frame, "TOPLEFT", -2, 2)
+	frame.border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", 2, -2)
+	frame.border:SetVertexColor(unpack(bdCore.media.border))
+	
 	if (resize ~= false) then
 		bdCore:hookEvent("bdcore_redraw",function()
 			local border = bdCore.config['General'].border or bdCore.general.border
 			
-			frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
-			frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
-				
-			if (border > 0) then
-				frame.background:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
-				frame.background:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
-				frame.background:SetBackdrop({
-					bgFile = bdCore.media.flat, 
-					edgeFile = bdCore.media.flat, edgeSize = border,
-					insets = { left = border, right = border, top = border, bottom = border }
-				})
-				frame.background:SetBackdropBorderColor(.06, .08, .09, 1)
-			else
-				frame.background:SetBackdrop({bgFile = bdCore.media.flat})
-			end
-			
-			frame.background:SetBackdropColor(.11,.15,.18, 1)
-			
+			frame.border:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
+			frame.border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
 		end)
 	end
 end
@@ -299,30 +321,42 @@ function bdCore:setSlashCommand(name, func, ...)
     end
 end
 
+function bdCore:isBlacklisted(name,caster)
+	local blacklist = c.sv["Auras"]["blacklist"]
+	
+	if (blacklist[name]) then
+		return true
+	end
+	return false
+end
 
 -- filter debuffs/buffs
-function bdCore:filterAura(name,caster)
-	local blacklist = c.sv["Aura Blacklist"]["blacklist"]
-	local whitelist = c.sv["Aura Whitelist"]["whitelist"]
-	local mine = c.sv["Personal Auras"]["mine"]
-	local class = c.sv["Personal Auras"][bdCore.class]
+function bdCore:filterAura(name,caster,invert)
+	--local name = string.lower(name)
+	local blacklist = c.sv["Auras"]["blacklist"]
+	local whitelist = c.sv["Auras"]["whitelist"]
+	local mine = c.sv["Auras"]["mine"]
+	local class = c.sv["Auras"][bdCore.class]
 	
 	-- raid variables are set in a file, they can be blacklisted though, and added to through whitelist
 	local raid = bdCore.auras.raid
 
+	-- everything is blacklisted by default
 	local allow = false
+	if (invert) then
+		allow = true
+	end
 	
-	if (blacklist[name] == true) then
+	
+	if (blacklist and blacklist[name] == true) then
 		allow = false
-	elseif (whitelist[name] == true) then
+	elseif (whitelist and whitelist[name] == true) then
 		allow = true
-	elseif (raid[name] == true) then
+	elseif (raid and raid[name] == true) then
 		allow = true
-	elseif (mine[name] == true and caster == "player") then
+	elseif (mine and mine[name] == true and caster == "player") then
 		allow = true
-	elseif (raid[name] == true) then
-		allow = true
-	elseif (class[name] == true) then
+	elseif (class and class[name] == true) then
 		allow = true
 	end
 	
@@ -340,6 +374,10 @@ end
 bdCore:setSlashCommand('ReloadUI', ReloadUI, 'rl', 'reset')
 
 
+SLASH_READYCHECK1 = "/rc"
+SlashCmdList["READYCHECK"] = function()
+	DoReadyCheck()
+end
 
 SLASH_BDCORE1, SLASH_BDCORE2 = "/bdcore", '/bd'
 SlashCmdList["BDCORE"] = function(msg, editbox)

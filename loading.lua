@@ -6,11 +6,11 @@ bdCore:RegisterEvent("PLAYER_REGEN_DISABLED")
 bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 	if (event == "ADDON_LOADED" and arg1 == "bdCore") then
-		bdCore:triggerEvent('loaded_bdcore')
 
 		if (not bdCoreDataPerChar) then
 			bdCoreDataPerChar = c
 		end
+		c.nr = bdCoreNoReset or {}
 		c.sv = bdCoreDataPerChar
 		c.sv.positions = c.sv.positions or {}
 		c.sv.auras = c.sv.auras or {}
@@ -18,8 +18,10 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		c.sv.auras.whitelist = c.sv.auras.whitelist or {}
 		c.sv.auras.blacklist = c.sv.auras.blacklist or {}
 		c.sv.auras.mine = c.sv.auras.mine or {}
-		c.sv.auras.player_class = c.sv.auras.mine.player_class or {}
+		c.sv.auras['Auras'] = c.sv.auras['Auras'] or {}
+		c.sv.auras['Auras'][bdCore.class] = c.sv.auras['Auras'][bdCore.class] or {}
 		c.sv.goldtrack = c.sv.goldtrack or {}
+		c.sv.gmotd = c.sv.gmotd or {}		
 		
 		-- if something is nil, it needs to get set
 		for group, options in pairs(c) do
@@ -44,14 +46,12 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		end
 		
 		bdCore:addModule("General", bdCore.general)
-		bdCore:addModule("Aura Whitelist", bdCore.whitelistconfig)
-		bdCore:addModule("Aura Blacklist", bdCore.blacklistconfig)
-		bdCore:addModule("Personal Auras", bdCore.personalconfig)
 		
-		bdCore:triggerEvent('bdcore_loaded')
+		--bdCore:triggerEvent('bdcore_loaded')
+		bdCore:triggerEvent('loaded_bdcore')
 		
 	elseif (event == "LOADING_SCREEN_DISABLED") then
-		bdCore:triggerEvent("bdcore_redraw")
+		--bdCore:triggerEvent("bdcore_redraw")
 	elseif (event == "PLAYER_REGEN_DISABLED") then
 		bdCore:triggerEvent('combat_enter')
 	elseif (event == "PLAYER_REGEN_ENABLED") then

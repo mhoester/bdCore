@@ -15,12 +15,14 @@ roleupdate:RegisterEvent("ROLE_CHANGED_INFORM")
 roleupdate:RegisterEvent("PVP_ROLE_UPDATE")
 roleupdate:SetScript("OnEvent", function(self, event, arg)
 	local spec_id = GetSpecialization()
-	if (spec_id) then
+	if (spec_id and GetSpecializationInfo(spec_id)) then
 		engine[1].spec = string.lower(select(2,GetSpecializationInfo(spec_id)))
 		engine[1].role = string.lower(select(6,GetSpecializationInfo(spec_id)))
 	
 	end
 end)
+
+
 
 function engine:unpack()
 	return self[1], self[2], self[3]
@@ -30,3 +32,10 @@ bdCore = engine[1]
 bdCore.colorString = '|cffA02C2Fbd|r'
 bdCore.config = engine[2]
 bdCore.frames = engine[3]
+local explevel = GetExpansionLevel()
+bdCore.isLegion = explevel == 6 or false
+
+bdCore.font = CreateFont("bdCore.font")
+bdCore.font:SetFont("Interface\\Addons\\bdCore\\media\\font.ttf", 13)
+bdCore.font:SetShadowColor(0, 0, 0)
+bdCore.font:SetShadowOffset(1, -1)

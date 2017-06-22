@@ -4,6 +4,8 @@ bdCore.oUF = engine.oUF or oUF
 
 local waiting = CreateFrame("frame",nil,bdCore)
 waiting.frames = {}
+
+--[[
 waiting:RegisterEvent("PLAYER_LEAVE_COMBAT")
 waiting:SetScript("OnEvent", function() 
 	for key, pack in pairs(waiting.frames) do
@@ -52,22 +54,54 @@ end
 local function AllPoints(frame, ...)
 	frame:ClearAllPoints()
 	frame:SetAllPoints(...)
-end
+end--]]
 
-local function StripTextures(Object, Kill, Text)
-	for i=1, Object:GetNumRegions() do
-		local Region = select(i, Object:GetRegions())
-		if Region:GetObjectType() == "Texture" then
-			if Kill then
-				Region:Kill()
-			else
-				Region:SetTexture(nil)
-			end
+--[[
+local function hookEvent(self, event, func)
+	local events = split(event,",") or {event}
+	for i = 1, #events do
+		e = events[i]
+		if (not bdCore.events[e]) then
+			bdCore.events[e] = {}
 		end
-	end		
+		bdCore.events[e][#bdCore.events[e]+1] = func(self)
+	end
 end
 
-local function SkinButton(Frame, Strip)
+local function AddAPI(object)
+	local mt = getmetatable(object).__index
+
+	if not object.hookEvent then mt.hookEvent = hookEvent end
+end
+local Handled = {["Frame"] = true}
+local Object = CreateFrame("Frame")
+AddAPI(Object)
+AddAPI(Object:CreateTexture())
+AddAPI(Object:CreateFontString())
+Object = EnumerateFrames()
+while Object do
+	if not Object:IsForbidden() and not Handled[Object:GetObjectType()] then
+		AddAPI(Object)
+		Handled[Object:GetObjectType()] = true
+	end
+	Object = EnumerateFrames(Object)
+end--]]
+
+function bdCore:StripTextures(Object, Text)
+	for i = 1, Object:GetNumRegions() do
+		local region = select(i, Object:GetRegions())
+		
+		if region:GetObjectType() == "Texture" then
+			region:SetTexture(nil)
+		elseif (Text) then
+			region:Hide(0)
+			region.Show = function() end
+			region:SetAlpha(0)
+		end
+	end	
+end
+
+function bdCore:SkinButton(Frame, Strip)
 	if Frame:GetName() then
 		local Left = _G[Frame:GetName().."Left"]
 		local Middle = _G[Frame:GetName().."Middle"]
@@ -104,60 +138,4 @@ local function SkinButton(Frame, Strip)
 		self:SetBackdropColor(unpack(bdCore.media.backdrop))
 		self:SetBackdropBorderColor(unpack(bdCore.media.border))	
 	end)
-end
-
----------------------------------------------------
--- Full credits to TukUI - merge functions into wow api
----------------------------------------------------
-local function AddAPI(object)
-	local mt = getmetatable(object).__index
-	
-	if not object.Size then mt.Size = Size end
-	if not object.Width then mt.Width = Width end
-	if not object.Height then mt.Height = Height end
-	if not object.Kill then mt.Kill = Kill end
-	if not object.FrameStrata then mt.FrameStrata = FrameStrata end
-	if not object.FrameLevel then mt.FrameLevel = FrameLevel end
-	if not object.StripTextures then mt.StripTextures = StripTextures end
-	if not object.StyleButton then mt.StyleButton = StyleButton end
-	if not object.Point then mt.Point = Point end
-	if not object.AllPoints then mt.AllPoints = AllPoints end
-	if not object.ClearPoints then mt.ClearPoints = ClearPoints end
-	
-	--[[
-	if not object.SetOutside then mt.SetOutside = SetOutside end
-	if not object.SetInside then mt.SetInside = SetInside end
-	if not object.SetTemplate then mt.SetTemplate = SetTemplate end
-	if not object.CreateBackdrop then mt.CreateBackdrop = CreateBackdrop end
-	if not object.CreateShadow then mt.CreateShadow = CreateShadow end
-	
-	if not object.FontString then mt.FontString = FontString end
-	if not object.HighlightUnit then mt.HighlightUnit = HighlightUnit end
-	if not object.HideInsets then mt.HideInsets = HideInsets end
-	if not object.SkinEditBox then mt.SkinEditBox = SkinEditBox end
-	if not object.SkinButton then mt.SkinButton = SkinButton end
-	if not object.SkinCloseButton then mt.SkinCloseButton = SkinCloseButton end
-	if not object.SkinArrowButton then mt.SkinArrowButton = SkinArrowButton end
-	if not object.SkinDropDown then mt.SkinDropDown = SkinDropDown end
-	if not object.SkinCheckBox then mt.SkinCheckBox = SkinCheckBox end
-	if not object.SkinTab then mt.SkinTab = SkinTab end
-	if not object.SkinScrollBar then mt.SkinScrollBar = SkinScrollBar end--]]
-end
-
-local Handled = {["Frame"] = true}
-
-local Object = CreateFrame("Frame")
-AddAPI(Object)
-AddAPI(Object:CreateTexture())
-AddAPI(Object:CreateFontString())
-
-Object = EnumerateFrames()
-
-while Object do
-	if not Object:IsForbidden() and not Handled[Object:GetObjectType()] then	
-		AddAPI(Object)
-		Handled[Object:GetObjectType()] = true
-	end
-
-	Object = EnumerateFrames(Object)
 end

@@ -1,5 +1,8 @@
 local bdCore, c, f = select(2, ...):unpack()
+
+
 bdCore.auras = {}
+--[[
 bdCore.auras.watch = {}
 bdCore.auras.watch[#bdCore.auras.watch+1] = {['Stats'] = {
 	1126, 
@@ -136,6 +139,8 @@ bdCore.auras.watched = {}
 for k, v in pairs(bdCore.auras.watch) do
 	table.insert(bdCore.auras.watched, v)
 end
+
+--]]
 
 bdCore.auras.raid = {
 	----------------------------------------------------
@@ -372,8 +377,228 @@ bdCore.auras.raid = {
 	['Fel Fury'] = true,
 	['Devouring Spirit'] = true,
 	
-	-- Players
-	['Draenic Channeled Mana Potion'] = true,
+	
+	----------------------------------------------------
+	-- Emerald Nightmare
+	----------------------------------------------------
+	-- Nythendra
+	['Infested Ground'] = true,
+	['Volatile Rot'] = true,
+	['Rot'] = true,
+	['Burst of Corruption'] = true,
+	['Infested Breath'] = true,
+	
+	-- Illgynoth
+	['Spew Corruption'] = true,
+	['Eye of Fate'] = true,
+	['Cursed Blood'] = true,
+	['Death Blossom'] = true,
+	['Dispersed Spores'] = true,
+	['Touch of Corruption'] = true,
+	
+	-- Renferal
+	['Web of Pain'] = true,
+	['Necrotic Venom'] = true,
+	['Dripping Fangs'] = true,
+	['Raking Talons'] = true,
+	['Twisting Shadows'] = true,
+	['Web of Pain'] = true,
+	['Tangled Webs'] = true,
+	
+	-- Ursoc
+	['Focused Gaze'] = true,
+	['Overwhelm'] = true,
+	['Rend Flesh'] = true,
+	
+	-- Dragons
+	['Nightmare Bloom'] = true,
+	['Slumbering Nightmare'] = true,
+	['Defiled Vines'] = true,
+	['Sleeping Fog'] = true,
+	['Shadow Burst'] = true,
+	
+	-- Cenarius
+	['Nightmare Javelin'] = true,
+	['Scorned Touch'] = true,
+	['Spear of Nightmares'] = true,
+	['Nightmare Brambles'] = true,
+	
+	-- Xavius
+	['Dream Simulacrum'] = true,
+	['Blackening Soul'] = true,	
+	['Darkening Soul'] = true,	
+	['Tainted Discharge'] = true,	
+	['Corruption: Decent into Madness'] = true,	
+	['Bonds of Terror'] = true,	
+	['Tormenting Fixation'] = true,	
+	
+	-- trash
+	['Befoulment'] = true,
+	
+	----------------------------------------------------
+	-- Trial of Valor
+	----------------------------------------------------
+	-- Odyn
+	['Shield of Light'] = true,
+	['Arcing Storm'] = true,
+	['Expel Light'] = true,
+	
+	-- Guarm
+	['Frost Lick'] = true,
+	['Flame Lick'] = true,
+	['Shadow Lick'] = true,
+	
+	['Flaming Volatile Foam'] = true,
+	['Briney Volatile Foam'] = true,
+	['Shadowy Volatile Foam'] = true,
+	
+	-- Helya
+	['Orb of Corruption'] = true,
+	['Orb of Corrosion'] = true,
+	['Taint of the Sea'] = true,
+	['Fetid Rot'] = true,
+	['Corrupted Axiom'] = true,
+	
+	-- trash
+	['Unholy Reckoning'] = true,
+	
+	----------------------------------------------------
+	-- Nighthold
+	----------------------------------------------------
+	-- Skorpyron
+	['Energy Surge'] = true,
+	['Broken Shard'] = true,
+	['Focused Blast'] = true,
+	
+	-- Chromatic Anomaly
+	['Time Bomb'] = true,
+	['Temporal Charge'] = true,
+	['Time Release'] = true,
+	
+	-- Trilliax
+	['Arcing Bonds'] = true,
+	['Sterilize'] = true,
+	['Annihilation'] = true,
+	
+	-- Aluriel
+	["Frostbitten"] = true,
+	["Annihilated"] = true,
+	["Searing Brand"] = true,
+	["Entombed in Ice"] = true,
+	["Mark of Frost"] = true,
+	
+	-- Tichondrius
+	['Carrion Plague'] = true,
+	['Feast of Blood'] = true,
+	['Essence of Night'] = true,
+	
+	-- Krosus
+	['Orb of Destruction'] = true,
+	['Searing Brand'] = true,
+	
+	-- Botanist
+	['Parasitic Fixate'] = true,
+	['Parasitic Fetter'] = true,
+	['Toxic Spores'] = true,
+	['Call of Night'] = true,
+	
+	-- Augor
+	['Icy Ejection'] = true,
+	['Chilled'] = true,
+	['Voidburst'] = true,
+	['Gravitational Pull'] = true,
+	['Witness the Void'] = true,
+	['Absolute Zero'] = true,
+	['Felflame'] = true,
+	
+	-- Elisande
+	['Ablation'] = true,
+	['Arcanetic Ring'] = true,
+	['Spanning Singularity'] = true,
+	['Delphuric Beam'] = true,
+	['Permeliative Torment'] = true,
+	
+	-- Gul'dan
+	['Drain'] = true,
+	['Fel Efflux'] = true,
+	['Soul Sever'] = true,
+	['Chaos Seed'] = true,
+	['Bonds of Fel'] = true,
+	['Soul Siphon'] = true,
+	['Flames of Sargeras'] = true,
+	['Soul Corrosion'] = true,
+	["Eye of Gul'dan"] = true,
+	["Empowered Eye of Gul'dan"] = true,
+	["Empowered Bonds of Fel"] = true,
+	["Bonds of Fel"] = true,
+	["Parasitic Wound"] = true,
+	["Chaos Seed"] = true,
+	["Severed Soul"] = true,
+	["Severed"] = true,
+	["Time Stop"] = true,
+	["Scattering Field"] = true,
+	["Shadowy Gaze"] = true,
+	
+	-- Trash
+	['Arcanic Release'] = true,
+	['Necrotic Strike'] = true,
+	['Surpress'] = true,
+	['Sanguine Ichor'] = true,
+	['Thunderstrike'] = true,
+	['Will of the Legion'] = true,
+	
+	
+	----------------------------------------------------
+	-- Tomb of Sargeras
+	----------------------------------------------------
+	-- Gorth
+	['Melted Armor'] = true,
+	['Burning Armor'] = true,
+	['Crashing Comet'] = true,
+	['Fel Pool'] = true,
+	['Shattering Star'] = true,
+	
+	-- Demonic Inquisition
+	['Suffocating Dark'] = true,
+	['Calcified Quills'] = true,
+	['Unbearable Torment'] = true,
+	
+	-- Harjatan
+	['Jagged Abrasion'] = true,
+	['Aqueous Burst'] = true,
+	['Drenching Waters'] = true,
+	['Driven Assault'] = true,
+	
+	-- Sisters of the Moon
+	['Moon Burn'] = true,
+	['Twilight Volley'] = true,
+	['Twilight Glaive'] = true,
+	['Incorporeal Shot'] = true,
+	
+	-- Mistress Sassz'ine
+	['Consuming Hunger'] = true,
+	['Delicious Bufferfish'] = true,
+	['Slicing Tornado'] = true,
+	['Hydra Shot'] = true,
+	['Slippery'] = true,
+	
+	-- Desolate Host
+	["Soul Bind"] = true,
+	["Spirit Chains"] = true,
+	["Soul Rot"] = true,
+	["Spear of Anguish"] = true,
+	["Shattering Scream"] = true,
+	
+	-- Maiden of Vigilance
+	['Unstable Soul'] = true,
+	
+	-- Fallen Avatar
+	['Tainted Essence'] = true,
+	
+	-- Kil'jaedan
+	['Felclaws'] = true,
+	['Shadow Reflection: Erupting'] = true,
+	['Shadow Reflection: Wailing'] = true,
 }
 
 bdCore.auras.whitelist = {
@@ -385,31 +610,45 @@ bdCore.auras.whitelist = {
 	--["Last Stand"] = true,
 	["Safeguard"] = true,
 	["Vigilance"] = true,
+	["Shockwave"] = true,
 	
 	-- Druids
 	["Barkskin"] = true,
 	["Survival Instincts"] = true,
 	["Ironbark"] = true,
 	["Bristling Fur"] = true,
-	
+	["Cyclone"] = true,
+	["Entangling Roots"] = true,
+	["Rapid Innervation"] = true,
+	["Mark of Ursol"] = true,
+	["Ironfur"] = true,
+	["Frenzied Regeneration"] = true,
+	["Rage of the Sleeper"] = true,
 	
 	-- Shamans
 	["Shamanistic Rage"] = true,
 	["Astral Shift"] = true,
 	["Stone Bulwark Totem"] = true,
+	["Hex"] = true,
+	["Reincarnation"] = true,
 	
 	-- Death Knights
 	["Icebound Fortitude"] = true,
-	--["Anti-Magic Shell"] = true,
+	["Anti-Magic Shell"] = true,
 	["Anti-Magic Zone"] = true,
 	["Vampiric Blood"] = true,
 	["Rune Tap"] = true,
+	["Strangulate"] = true,
 	
 	-- Rogues
 	["Feint"] = true,
 	["Cloak of Shadows"] = true,
-	["Evasion"] = true,
+	["Riposte"] = true,
 	["Smoke Bomb"] = true,
+	["Between the Eyes"] = true,
+	["Sap"] = true,
+	["Evasion"] = true,
+	["Crimson Vial"] = true,
 	
 	-- Mages
 	["Ice Block"] = true,
@@ -418,6 +657,8 @@ bdCore.auras.whitelist = {
 	["Greater Invisibility"] = true,
 	["Amplify Magic"] = true,
 	["Evanesce"] = true,
+	["Polymorph"] = true,
+	["Polymorph: Fish"] = true,
 	
 	-- Warlocks
 	["Dark Bargain"] = true,
@@ -426,12 +667,12 @@ bdCore.auras.whitelist = {
 	-- Paladins
 	["Divine Shield"] = true,
 	["Divine Protection"] = true,
-	["Hand of Protection"] = true,
-	["Hand of Sacrifice"] = true,
-	["Hand of Purity"] = true,
+	["Blessing of Freedom"] = true,
+	["Blessing of Sacrifice"] = true,
 	["Ardent Defender"] = true,
 	["Guardian of Ancient Kings"] = true,
 	["Forbearance"] = true,
+	["Hammer of Justice"] = true,
 	
 	
 	-- Monks
@@ -440,19 +681,34 @@ bdCore.auras.whitelist = {
 	["Diffuse Magic"] = true,
 	["Dampen Harm"] = true,
 	["Touch of Karma"] = true,
+	["Paralyze"] = true,
 	
 	-- Hunters
-	["Deterrence"] = true,
+	["Aspect of the Turtle"] = true,
 	["Roar of Sacrifice"] = true,
 	
 	-- Priests
 	["Dispersion"] = true,
 	["Spectral Guise"] = true,
 	["Pain Suppression"] = true,
+	["Fear"] = true,
+	["Mind Bomb"] = true,
+	["Surrender Soul"] = true,
+	["Guardian Spirit"] = true,
+	
+	-- Demon hunters
+	['Blur'] = true,
+	['Demon Spikes'] = true,
+	['Metamorphosis'] = true,
+	['Empower Wards'] = true,
+	
+	-- all palyers
+	['Draenic Channeled Mana Potion'] = true,
+	['Leytorrent Potion'] = true,
+	['Sanguine Ichor'] = true,
 }
 bdCore.auras.blacklist = {
 	-- paladins
-	["Illuminated Healing"] = true,
 	["Unyielding Faith"] = true,
 	["Glyph of Templar's Verdict"] = true,
 	["Beacon's Tribute"] = true,
@@ -501,40 +757,44 @@ bdCore.auras.blacklist = {
 	["Beacon's Tribute"] = true
 }
 
-bdCore.auras.player_class = {
+bdCore.auras['Personal Auras'] = {
 	preist = {
 		["Weakened Soul"] = true,
 	},
 	paladin = {
-
+		["Blessing of Sacrifice"] = true,		
+		["Blessing of Protection"] = true,		
 	},
 	deathknight = {
-
+		
 	},
 	rogue = {
-
+		
 	},
 	shaman = {
-
+		
 	},
 	warlock = {
-
+		
 	},
 	mage = {
-
+		
 	},
 	monk = {
-
+		
 	},
 	hunter = {
-
+		
 	},
 	druid = {
-
+		
 	},
 	warrior = {
-
-	}
+		
+	},
+	demonhunter = {
+		
+	},
 }
 
 bdCore.auras.mine = {
@@ -542,12 +802,14 @@ bdCore.auras.mine = {
 	["Rejuvenation"] = true,
 	["Regrowth"] = true,
 	["Rejuvenation (Germination)"] = true,
-	["Prayer of Mending"] = true,
 	
 	["Eternal Flame"] = true,
 	["Sacred Shield"] = true,
 	["Beacon of Light"] = true,
 	["Beacon of Faith"] = true,
 	["Weakened Soul"] = true,
+	
+	-- Priest
+	["Renew"] = true,
+	["Prayer of Mending"] = true,
 }
-
