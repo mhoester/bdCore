@@ -7,7 +7,7 @@ bdCore:hookEvent("loaded_bdcore", function()
 	powerbar:SetSize(200, 20)
 	powerbar:SetStatusBarColor(.2, .4, 0.8, 1)
 	powerbar:SetPoint("CENTER",UIParent,"CENTER", 0, 0)
-	powerbar:Show()
+	powerbar:Hide()
 	bdCore:setBackdrop(powerbar)
 	bdCore:makeMovable(powerbar)
 	
@@ -30,22 +30,25 @@ bdCore:hookEvent("loaded_bdcore", function()
 				PlayerPowerBarAlt:Show()
 			end
 			
-			return
-		end
-		PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_SHOW")
-		PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_HIDE")
-		PlayerPowerBarAlt:UnregisterEvent("PLAYER_ENTERING_WORLD")
-		PlayerPowerBarAlt:Hide()
-		if UnitAlternatePowerInfo("player") or UnitAlternatePowerInfo("target") then
-			self:Show()
-			
-			self:SetMinMaxValues(0, UnitPowerMax("player", ALTERNATE_POWER_INDEX))
-			local power = UnitPower("player", ALTERNATE_POWER_INDEX)
-			local mpower = UnitPowerMax("player", ALTERNATE_POWER_INDEX)
-			self:SetValue(power)
-			self.text:SetText(power.."/"..mpower)
-		else
 			self:Hide()
+			
+			return
+		else
+			PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_SHOW")
+			PlayerPowerBarAlt:UnregisterEvent("UNIT_POWER_BAR_HIDE")
+			PlayerPowerBarAlt:UnregisterEvent("PLAYER_ENTERING_WORLD")
+			PlayerPowerBarAlt:Hide()
+			if UnitAlternatePowerInfo("player") or UnitAlternatePowerInfo("target") then
+				self:Show()
+				
+				self:SetMinMaxValues(0, UnitPowerMax("player", ALTERNATE_POWER_INDEX))
+				local power = UnitPower("player", ALTERNATE_POWER_INDEX)
+				local mpower = UnitPowerMax("player", ALTERNATE_POWER_INDEX)
+				self:SetValue(power)
+				self.text:SetText(power.."/"..mpower)
+			else
+				self:Hide()
+			end
 		end
 	end)
 end)
