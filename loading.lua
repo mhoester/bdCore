@@ -5,7 +5,7 @@ bdCore:RegisterEvent("PLAYER_REGEN_ENABLED")
 bdCore:RegisterEvent("PLAYER_REGEN_DISABLED")
 bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
-	if (event == "ADDON_LOADED" and arg1 == "bdCore") then
+	if (event == "ADDON_LOADED" and (arg1 == "bdCore" or arg1 == "bdcore")) then
 
 		if (not bdCoreDataPerChar) then
 			bdCoreDataPerChar = c
