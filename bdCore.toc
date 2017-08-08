@@ -28,3 +28,4 @@ scripts\interrupted.lua
 scripts\doubleclickbo.lua
 scripts\fontchange.lua
 scripts\altpower.lua
+scripts\autohide.lua

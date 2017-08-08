@@ -594,11 +594,18 @@ bdCore.auras.raid = {
 	
 	-- Fallen Avatar
 	['Tainted Essence'] = true,
+	['Black Winds'] = true,
+	['Dark Mark'] = true,
 	
 	-- Kil'jaedan
 	['Felclaws'] = true,
 	['Shadow Reflection: Erupting'] = true,
 	['Shadow Reflection: Wailing'] = true,
+	['Shadow Reflection: Hopeless'] = true,
+	['Armageddon Rain'] = true,
+	['Lingering Eruption'] = true,
+	['Lingering Wail'] = true,
+	['Soul Anguish'] = true,
 }
 
 bdCore.auras.whitelist = {
