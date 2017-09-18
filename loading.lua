@@ -5,6 +5,8 @@ bdCore:RegisterEvent("PLAYER_REGEN_ENABLED")
 bdCore:RegisterEvent("PLAYER_REGEN_DISABLED")
 bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
+	
+
 	if (event == "ADDON_LOADED" and (arg1 == "bdCore" or arg1 == "bdcore")) then
 
 		if (not bdCoreDataPerChar) then
@@ -52,6 +54,10 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		
 	elseif (event == "LOADING_SCREEN_DISABLED") then
 		--bdCore:triggerEvent("bdcore_redraw")
+		SetCVar("uiScale", bdCore.scale)
+		SetCVar("useUIScale", 0)
+		SetCVar("uiScaleMultiplier", -1)
+		UIParent:SetScale(bdCore.scale)
 	elseif (event == "PLAYER_REGEN_DISABLED") then
 		bdCore:triggerEvent('combat_enter')
 	elseif (event == "PLAYER_REGEN_ENABLED") then

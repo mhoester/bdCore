@@ -29,3 +29,4 @@ scripts\doubleclickbo.lua
 scripts\fontchange.lua
 scripts\altpower.lua
 scripts\autohide.lua
+scripts\qol.lua

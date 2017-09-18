@@ -24,6 +24,22 @@ end
 
 interrupt:SetScript('OnEvent', OnEvent)
 
+-- FontString scannign
+--[[local function scanChildren(obj)
+	local children = {obj:GetChildren()}
+	for k, v in pairs(children) do
+		if (not (v:IsForbidden()) and v:GetObjectType() == "FontString" and not v.bdHooked) then
+			v.bdHooked = true
+			v.oldSetText = v.SetText
+			v.SetText = function(self, text) 
+				self:oldSetText(text)
+			end
+		elseif (not (v:IsForbidden()) and v:GetObjectType() == "Frame") then
+			scanChildren(v)
+		end
+	end
+end
+scanChildren(UIParent)--]]
 --[[
 local raid_specs = {}
 local inspect_pending = {}
