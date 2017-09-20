@@ -7,6 +7,7 @@ engine[3] = {}
 engine[1]:RegisterEvent("ADDON_LOADED")
 
 engine[1].class = string.lower(select(1, UnitClass('player')))
+engine[1].name = string.lower(UnitName('player'))
 
 engine[1].scale = 768/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)")
 

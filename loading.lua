@@ -12,8 +12,31 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		if (not bdCoreDataPerChar) then
 			bdCoreDataPerChar = c
 		end
+		
+
+		--[[
+		if (not bdCoreDataPerChar.profiles_data.current_profile) then
+			bdCoreDataPerChar.profiles_data = {}
+			bdCoreDataPerChar.profiles_data.profiles = {}
+			bdCoreDataPerChar.profiles_data.profiles['account_wide'] = bdCoreDataPerChar
+			bdCoreDataPerChar.profiles_data.per_spec_profiles = false
+			bdCoreDataPerChar.profiles_data.spec_profile = {}
+			bdCoreDataPerChar.profiles_data.spec_profile[1] = false
+			bdCoreDataPerChar.profiles_data.spec_profile[2] = false
+			bdCoreDataPerChar.profiles_data.spec_profile[3] = false
+			bdCoreDataPerChar.profiles_data.spec_profile[4] = false
+			
+			bdCoreDataPerChar.profiles_data.current_profile = 'account_wide'
+		end
+		
+		-- Profiles
+		print(bdCoreDataPerChar.profiles_data.current_profile)
+		local current_profile = bdCoreDataPerChar.profiles_data.profiles[bdCoreDataPerChar.profiles_data.current_profile]
+		print("current profile", current_profile)
+		print("main data", bdCoreDataPerChar) --]]
 		c.nr = bdCoreNoReset or {}
 		c.sv = bdCoreDataPerChar
+		
 		c.sv.positions = c.sv.positions or {}
 		c.sv.auras = c.sv.auras or {}
 		c.sv.auras.raid = c.sv.auras.raid or {}
@@ -47,6 +70,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 			end
 		end
 		
+		bdCore:triggerEvent('profile_config')
 		bdCore:addModule("General", bdCore.general)
 		
 		--bdCore:triggerEvent('bdcore_loaded')

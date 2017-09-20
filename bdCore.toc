@@ -20,6 +20,7 @@ api.lua
 auras.lua
 config\defaults.lua
 config\config.lua
+profiles.lua
 loading.lua
 scripts\bigwigsskin.lua
 scripts\gmotd.lua
