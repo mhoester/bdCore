@@ -350,6 +350,10 @@ function bdCore:addModule(name,configs)
 	
 	cfg.options[name] = navitem
 	cfg.panels[name] = panels
+
+	-- combination of both the profile and persistent config which we'll return at the end
+	local smartConfig = {}
+	smart_config[name] = {}
 	
 	if (configs) then
 		local scrollheight = 0
@@ -357,9 +361,9 @@ function bdCore:addModule(name,configs)
 		for i = 1, #configs do
 			local conf = configs[i]		
 			
-			
-			
 			for option, info in pairs(conf) do
+
+				-- store the variable in either the persitent or profile, as well as the smart_config
 				if (info.persistent) then
 					c.persistent[name] = c.persistent[name] or {}
 					if (c.persistent[name][option] == nil) then
@@ -369,6 +373,8 @@ function bdCore:addModule(name,configs)
 
 						c.persistent[name][option] = info.value
 					end
+
+					smart_config[name][option] = c.persistent[name][option]
 				else
 					c.profile[name] = c.profile[name] or {}
 					if (c.profile[name][option] == nil) then
@@ -378,6 +384,8 @@ function bdCore:addModule(name,configs)
 
 						c.profile[name][option] = info.value
 					end
+
+					smart_config[name][option] = c.profile[name][option]
 				end
 				
 				
@@ -440,10 +448,8 @@ function bdCore:addModule(name,configs)
 		--panels.lastpanel.scrollframe:SetPoint("TOPRIGHT", panels, "TOPRIGHT", -30, -40) 
 		--panels.lastpanel.scrollbar:SetPoint("TOPRIGHT", panels, "TOPRIGHT", -2, -48) 
 	end
-	--collectgarbage()
-	--return bdCore.config[name]
-	--return smartconf
-	--return nothing actually
+	
+	return smart_config
 end
 
 --------------------------------------------------
