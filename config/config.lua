@@ -391,7 +391,7 @@ function bdCore:addModule(name,configs)
 				
 				-- Create a general tab for everything to anchor to if no other tab is started
 				if (info.type ~= "tab" and not panels.tabstarted) then
-					panels.tabs:addTab("Profiles")
+					panels.tabs:addTab("General")
 				end
 				
 				--scrollheight = panels.lastpanel.scrollheight
@@ -435,7 +435,7 @@ function bdCore:addModule(name,configs)
 	end
 	
 	-- If there aren't additional tabs, act like non exist
-	if (panels.lastbutton.text:GetText() == "Profiles") then
+	if (panels.lastbutton.text:GetText() == "General") then
 		panels.tabs:Hide()
 		panels.lastpanel:SetPoint("TOPLEFT", panels, "TOPLEFT", 8, -8)
 		--panels.lastpanel.content:SetSize(panels:GetWidth()-20, panels:GetHeight())
