@@ -556,6 +556,7 @@ function bdCore:createText(group, info)
 	
 	return text
 end
+
 function bdCore:createList(group,option,info)
 	--local panels = cfg.config[group]
 	--local panel = cfg.config[group].lastcontent
@@ -746,7 +747,7 @@ function bdCore:createList(group,option,info)
 	end
 end
 
-function bdCore:createDropdown(group, option, info)
+function bdCore:createDropdown(group, option, info, custompanel)
 	--local panels = cfg.config[group]
 	--local panel = cfg.config[group].lastcontent
 	local panel = cfg.config[group].lastpanel
