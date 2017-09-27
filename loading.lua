@@ -6,15 +6,11 @@ bdCore:RegisterEvent("PLAYER_REGEN_DISABLED")
 bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
 --bdCore:RegisterEvent("PLAYER_ENTERING_WORLD")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
-<<<<<<< HEAD
-=======
-
 	-- set UIScale manually, since the CVAR won't let you go beneath 0.64 (why blizz??)
 	if (not InCombatLockdown()) then
-		SetCVar("uiScale", bdCore.scale)
-		SetCVar("useUIScale", 0)
-		SetCVar("uiScaleMultiplier", -1)
->>>>>>> f5414d2e900da878700342eafa44d53464587452
+		--SetCVar("uiScale", bdCore.scale)
+		--SetCVar("useUIScale", 0)
+		--SetCVar("uiScaleMultiplier", -1)
 		UIParent:SetScale(bdCore.scale)
 	end
 
