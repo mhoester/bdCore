@@ -350,6 +350,10 @@ function bdCore:addModule(name,configs)
 	
 	cfg.options[name] = navitem
 	cfg.panels[name] = panels
+
+	-- combination of both the profile and persistent config which we'll return at the end
+	local smartConfig = {}
+	smart_config[name] = {}
 	
 	if (configs) then
 		local scrollheight = 0
@@ -357,17 +361,33 @@ function bdCore:addModule(name,configs)
 		for i = 1, #configs do
 			local conf = configs[i]		
 			
-			c[name] = c[name] or {}
-			c.sv[name] = c.sv[name] or {}
-			
 			for option, info in pairs(conf) do
-				if (c[name][option] == nil) then
-					if (info.value == nil) then
-						info.value = {}
+
+				-- store the variable in either the persitent or profile, as well as the smart_config
+				if (info.persistent) then
+					c.persistent[name] = c.persistent[name] or {}
+					if (c.persistent[name][option] == nil) then
+						if (info.value == nil) then
+							info.value = {}
+						end
+
+						c.persistent[name][option] = info.value
 					end
-					c[name][option] = info.value
-					c.sv[name][option] = info.value
+
+					smart_config[name][option] = c.persistent[name][option]
+				else
+					c.profile[name] = c.profile[name] or {}
+					if (c.profile[name][option] == nil) then
+						if (info.value == nil) then
+							info.value = {}
+						end
+
+						c.profile[name][option] = info.value
+					end
+
+					smart_config[name][option] = c.profile[name][option]
 				end
+				
 				
 				-- Create a general tab for everything to anchor to if no other tab is started
 				if (info.type ~= "tab" and not panels.tabstarted) then
@@ -398,8 +418,6 @@ function bdCore:addModule(name,configs)
 					scrollheight = scrollheight + 40
 					bdCore:colorPicker(name, option, info)
 				end
-				
-				smartconf[option] = c[name][option]
 			end
 
 		end
@@ -430,9 +448,8 @@ function bdCore:addModule(name,configs)
 		--panels.lastpanel.scrollframe:SetPoint("TOPRIGHT", panels, "TOPRIGHT", -30, -40) 
 		--panels.lastpanel.scrollbar:SetPoint("TOPRIGHT", panels, "TOPRIGHT", -2, -48) 
 	end
-	--collectgarbage()
-	return bdCore.config[name]
-	--return smartconf
+	
+	return smart_config
 end
 
 --------------------------------------------------
@@ -447,13 +464,20 @@ function bdCore:colorPicker(group, option, info)
 	local picker = CreateFrame("button",nil,container)
 	picker:SetSize(20, 20)
 	picker:SetBackdrop({bgFile = bdCore.media.flat, edgeFile = bdCore.media.flat, edgeSize = 2, insets = {top = 2, right = 2, bottom = 2, left = 2}})
-	picker:SetBackdropColor(unpack(c[group][option]))
+	if (info.persistent) then
+		picker:SetBackdropColor(unpack(c.persistent[group][option]))
+	else
+		picker:SetBackdropColor(unpack(c.profile[group][option]))
+	end
 	picker:SetBackdropBorderColor(0,0,0,1)
 	picker:SetPoint("LEFT", container, "LEFT", 0, 0)
 	
 	picker.callback = function(self, r, g, b, a)
-		c[group][option] = {r,g,b,a}
-		c.sv[group][option] = {r,g,b,a}
+		if (info.persistent) then
+			c.persistent[group][option] = {r,g,b,a}
+		else
+			c.profile[group][option] = {r,g,b,a}
+		end
 		self:SetBackdropColor(r,g,b,a)
 		
 		return r, g, b, a
@@ -461,7 +485,11 @@ function bdCore:colorPicker(group, option, info)
 	
 	picker:SetScript("OnClick",function()		
 		HideUIPanel(ColorPickerFrame)
-		local r,g,b,a = unpack(c.sv[group][option])
+		if (info.persistent) then
+			local r,g,b,a = unpack(c.persistent[group][option])
+		else
+			local r,g,b,a = unpack(c.profile[group][option])
+		end
 		ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 		ColorPickerFrame:SetClampedToScreen(true)
 		ColorPickerFrame.hasOpacity = true
@@ -528,6 +556,7 @@ function bdCore:createText(group, info)
 	
 	return text
 end
+
 function bdCore:createList(group,option,info)
 	--local panels = cfg.config[group]
 	--local panel = cfg.config[group].lastcontent
@@ -639,10 +668,18 @@ function bdCore:createList(group,option,info)
 		local string = "";
 		local height = 0;
 		
-		for k, v in pairs(c.sv[group][option]) do
-			string = string..k.."\n";
-			height = height + 13
-			container.insert:AddHistoryLine(k)
+		if (info.persistent) then
+			for k, v in pairs(c.persistent[group][option]) do
+				string = string..k.."\n";
+				height = height + 13
+				container.insert:AddHistoryLine(k)
+			end
+		else
+			for k, v in pairs(c.profile[group][option]) do
+				string = string..k.."\n";
+				height = height + 13
+				container.insert:AddHistoryLine(k)
+			end
 		end
 		local scrollheight = height-200
 		if (scrollheight < 1) then 
@@ -675,18 +712,30 @@ function bdCore:createList(group,option,info)
 	function container.addremove(value)
 		--local value = string.lower(value)
 		container.insert:AddHistoryLine(value)
-		if(c.sv[group][option][value]) then
-			c[group][option][value] = nil
-			c.sv[group][option][value] = nil
-			container.insert.alert:SetText(value.." removed")
-			container.insert.alert:SetTextColor(1, .3, .3)
-			container:startfade()
+		if (info.persistent) then
+			if (c.persistent[group][option][value]) then
+				c.persistent[group][option][value] = nil
+				container.insert.alert:SetText(value.." removed")
+				container.insert.alert:SetTextColor(1, .3, .3)
+				container:startfade()
+			else
+				c.persistent[group][option][value] = true
+				container.insert.alert:SetText(value.." added")
+				container.insert.alert:SetTextColor(.3, 1, .3)
+				container:startfade()
+			end
 		else
-			c[group][option][value] = true
-			c.sv[group][option][value] = true
-			container.insert.alert:SetText(value.." added")
-			container.insert.alert:SetTextColor(.3, 1, .3)
-			container:startfade()
+			if (c.profile[group][option][value]) then
+				c.profile[group][option][value] = nil
+				container.insert.alert:SetText(value.." removed")
+				container.insert.alert:SetTextColor(1, .3, .3)
+				container:startfade()
+			else
+				c.profile[group][option][value] = true
+				container.insert.alert:SetText(value.." added")
+				container.insert.alert:SetTextColor(.3, 1, .3)
+				container:startfade()
+			end
 		end
 		container.populate()
 	end
@@ -698,7 +747,7 @@ function bdCore:createList(group,option,info)
 	end
 end
 
-function bdCore:createDropdown(group, option, info)
+function bdCore:createDropdown(group, option, info, custompanel)
 	--local panels = cfg.config[group]
 	--local panel = cfg.config[group].lastcontent
 	local panel = cfg.config[group].lastpanel
@@ -732,7 +781,11 @@ function bdCore:createDropdown(group, option, info)
 	container.selected = container:CreateFontString(nil)
 	container.selected:SetFont(media.font, 13)
 	container.selected:SetPoint("LEFT", container, "LEFT", 6, 0)
-	container.selected:SetText(c.sv[group][option])
+	if (info.persistent) then
+		container.selected:SetText(c.persistent[group][option])
+	else
+		container.selected:SetText(c.profile[group][option])
+	end
 	
 	function container:click()
 		if (dropdown.dropped) then
@@ -783,14 +836,19 @@ function bdCore:createDropdown(group, option, info)
 		end
 		
 		item:SetScript("OnClick", function(self)
-			c[group][option] = self.label:GetText()
-			c.sv[group][option] = self.label:GetText()
-			
+			local text = self.label:GetText()
+
+			if (info.persistent) then
+				c.persistent[group][option] = self.label:GetText()
+			else
+				c.profile[group][option] = self.label:GetText()
+			end
+
 			if (info.callback) then
 				info:callback()
 			end
 		
-			container.selected:SetText(c.sv[group][option])
+			container.selected:SetText(text)
 			container:click()
 		end)
 		
@@ -821,7 +879,6 @@ function bdCore:createSlider(group, option, info)
 	
 	slider:SetOrientation('HORIZONTAL')
 	slider:SetMinMaxValues(info.min,info.max)
-	slider:SetValue(c.sv[group][option])
 	slider:SetObeyStepOnDrag(true)
 	slider:SetValueStep(info.step)
 	slider.tooltipText = info.tooltip
@@ -840,20 +897,35 @@ function bdCore:createSlider(group, option, info)
 	_G[slider:GetName() .. 'Text']:SetFont(media.font, 14)
 	slider.value = slider:CreateFontString(nil)
 	slider.value:SetFont(media.font, 12)
-	slider.value:SetText(c.sv[group][option])
+	if (info.persistent) then
+		slider:SetValue(c.persistent[group][option])
+		slider.value:SetText(c.persistent[group][option])
+	else
+		slider:SetValue(c.profile[group][option])
+		slider.value:SetText(c.profile[group][option])
+	end
 	slider.value:SetTextColor(1,1,1)
 	slider.value:SetPoint("TOP", slider,"BOTTOM", 0, -2)
 	slider:Show()
 	slider:SetScript("OnValueChanged", function(self)
 		local newval = round(slider:GetValue(), 1)
-		if (c.sv[group][option] == newval) then -- throttle it changing on every pixel
-			return false
+
+		if (info.persistent) then
+			if (c.persistent[group][option] == newval) then -- throttle it changing on every pixel
+				return false
+			end
+
+			c.persistent[group][option] = newval
+		else
+			if (c.profile[group][option] == newval) then -- throttle it changing on every pixel
+				return false
+			end
+
+			c.profile[group][option] = newval
 		end
+
 		slider:SetValue(newval)
 		slider.value:SetText(newval)
-		
-		c[group][option] = newval
-		c.sv[group][option] = newval
 		
 		if (info.callback) then
 			info:callback()
@@ -888,10 +960,17 @@ function bdCore:createCheckButton(group, option, info)
 	_G[check:GetName().."Text"]:ClearAllPoints()
 	_G[check:GetName().."Text"]:SetPoint("LEFT", check, "RIGHT", 2, 1)
 	check.tooltip = info.tooltip;
-	check:SetChecked(c.sv[group][option])
+	if (info.persistent) then
+		check:SetChecked(c.persistent[group][option])
+	else
+		check:SetChecked(c.profile[group][option])
+	end
 	check:SetScript("OnClick", function(self)
-		c[group][option] = self:GetChecked()
-		c.sv[group][option] = self:GetChecked()
+		if (info.persistent) then
+			c.persistent[group][option] = self:GetChecked()
+		else
+			c.profile[group][option] = self:GetChecked()
+		end
 		
 		if (info.callback) then
 			info:callback(check)
