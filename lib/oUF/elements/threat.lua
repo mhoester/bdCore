@@ -29,11 +29,12 @@
                   Removing the table key entry will make the element fall-back
                   to its internal function again.
 ]]
-
+print("test")
 local parent, ns = ...
 local oUF = ns.oUF
 
 local Update = function(self, event, unit)
+	print(unit)
 	if(unit ~= self.unit) then return end
 
 	local threat = self.Threat
@@ -43,7 +44,8 @@ local Update = function(self, event, unit)
 	local status = UnitThreatSituation(unit)
 
 	local r, g, b
-	if(status and status > 0) then
+	print(status)
+	if(status and status > 1) then
 		r, g, b = GetThreatStatusColor(status)
 		threat:SetVertexColor(r, g, b)
 		threat:Show()
@@ -65,11 +67,12 @@ local ForceUpdate = function(element)
 end
 
 local Enable = function(self)
+	print("module?")
 	local threat = self.Threat
 	if(threat) then
 		threat.__owner = self
 		threat.ForceUpdate = ForceUpdate
-
+		print("here")
 		self:RegisterEvent("UNIT_THREAT_SITUATION_UPDATE", Path)
 		self:RegisterEvent("UNIT_THREAT_LIST_UPDATE", Path)
 
