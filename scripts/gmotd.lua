@@ -24,8 +24,8 @@ gmotd.button:SetText("Got it");
 bdCore:skinButton(gmotd.button,false)
 gmotd.button:SetPoint("TOP", gmotd, "BOTTOM", 0, -4)
 gmotd.button:SetScript("OnClick",function(self)
-	c.sv.gmotd = {}
-	c.sv.gmotd[gmotd.msg] = true
+	c.persistent.gmotd = {}
+	c.persistent.gmotd[gmotd.msg] = true
 	gmotd:Hide()
 end)
 
@@ -43,7 +43,7 @@ gmotd:SetScript("OnEvent", function(self, event, message)
 		guild = select(1, GetGuildInfo("player"))
 	end
 	
-	if (string.len(msg) > 0 and not c.sv.gmotd[msg] and guild) then
+	if (string.len(msg) > 0 and not c.persistent.gmotd[msg] and guild) then
 		gmotd.msg = msg
 		gmotd.text:SetText(msg)
 		gmotd.header:SetText(guild.." - Message of the Day")

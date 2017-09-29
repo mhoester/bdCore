@@ -1,19 +1,66 @@
 local bdCore, c, f = select(2, ...):unpack()
 
+local config = {}
+local function profileDropdown(dropdown) 
+	print(dropdown, "profileDropdown")
+
+	local profile_table = {}
+	for k, v in pairs(c.profiles) do
+		table.insert(profile_table, k)
+	end
+
+	--table.insert(profile_table, "test")
+
+	dropdown:populate(profile_table)
+end
+
+local function profileChange(value)
+	print("profile change", value)
+
+	c.user.profile = value
+
+	c.profile = c.profiles[c.user.profile]
+
+	bdCore:triggerEvent("bd_reconfig")
+end
+
+local function addProfile(value) 
+	print("add profile", value)
+
+	c.profiles[value] = c.profile
+
+	bdCore:triggerEvent("bd_update_profiles")
+end
+
+local function deleteProfile()
+	if (c.user.profile == "default") then
+		print("You cannot delete the default profile, but you're free to modify it")
+		return 
+	end
+
+	c.profiles[c.user.profile] = nil
+
+	c.user.profile = "default"
+	profileChange('default')
+
+	bdCore:triggerEvent("bd_update_profiles")
+end
+
 local function profileCallback(...) 
 	
 end
 
 bdCore:hookEvent('profile_config',function() 
-	local profiles_string = ""
+
 	local profile_table = {}
 	for k, v in pairs(c.profiles) do
-		table.insert(profiles_table, k)
-		profiles_string = profiles_string..k..","
+		table.insert(profile_table, k)
 	end
-	profiles_string = "{"..strsub(profiles, 0, -1).."}"
 
-	print(profiles_string)
+	-- make new profile form
+	local name, realm = UnitName("player")
+	realm = GetRealmName()
+	local placeholder = name.."-"..realm
 	
 	local defaults = {}
 	defaults[#defaults+1] = {intro = {
@@ -23,44 +70,30 @@ bdCore:hookEvent('profile_config',function()
 	defaults[#defaults+1] = {currentprofile = {
 		type = "dropdown",
 		value = c.user.profile,
+		override = true,
+		button = "Create & Copy",
+		description = "Create New Profile: ",
 		options = profile_table,
+		update = function(dropdown) profileDropdown(dropdown) end,
+		updateOn = "bd_update_profiles",
 		tooltip = "Your currently selected profile.",
-		callback = function(...) profileCallback(...) end
+		callback = function(self, value) profileChange(value) end
+	}}
+	defaults[#defaults+1] = {createprofile = {
+		type = "createbox",
+		value = placeholder,
+		tooltip = "Your currently selected profile.",
+		callback = function(self, value) addProfile(value) end
+	}}
+	defaults[#defaults+1] = {deleteprofile = {
+		type = "actionbutton",
+		value = "Delete Profile",
+		callback = function(self) deleteProfile() end
 	}}
 
 	bdCore:addModule("Profiles", defaults)
-	
-	local panel = f.config.panels['Profiles']
-	print("this is our panel", panel)
+	config = bdCore.config.profile['Profiles']
 
-	-- make new profile form
-	local name, realm = UnitName("player")
-	realm = GetRealmName()
-	local placeholder = name.."-"..realm
-
-	local create = CreateFrame("EditBox",nil,panel)
-	create:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, 100)
-	create:SetSize(200,20)
-	bdCore:setBackdrop(create)
-	create.background:SetVertexColor(.10,.14,.17,1)
-	create:SetFont(media.font,12)
-	create:SetText(placeholder)
-	create:SetTextInsets(6, 2, 2, 2)
-	create:SetMaxLetters(200)
-	create:SetHistoryLines(1000)
-	create:SetAutoFocus(false) 
-	create:SetScript("OnEnterPressed", function(self, key) create.button:Click() end)
-	create:SetScript("OnEscapePressed", function(self, key) self:ClearFocus() end)
-
-	create.label = create:CreateFontString(nil)
-	create.label:SetFont(bdCore.media.font, 12)
-	create.label:SetText("Create New Profile: ")
-	create.label:SetPoint("BOTTOMLEFT", create, "TOPLEFT", 0, 4)
-
-	create.button = CreateFrame("Button", nil, create, "UIPanelButtonTemplate")
-	create.button:SetPoint("LEFT", create, "RIGHT", 4, 0)
-	create.button:SetText("Create")
-	
 
 	-- current profile form
 	
