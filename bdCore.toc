@@ -3,9 +3,10 @@
 ## Version: 0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
+## SavedVariables: bdCoreData
 ## SavedVariables: BD_persistent
-## SavedVariables: BD_users
 ## SavedVariables: BD_profiles
+## SavedVariablesPerCharacter: BD_user
 
 core.lua
 

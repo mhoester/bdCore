@@ -456,26 +456,33 @@ end
 function bdCore:createActionButton(group, option, info, persistent)
 	local panel = cfg.config[group].lastpanel
 	local create = CreateFrame("Button",nil,panel, "UIPanelButtonTemplate")
+	local container = CreateFrame("frame",nil,panel)
+	container:SetSize(configdims.rightwidth,30)
 
+	create:SetPoint("TOPLEFT", container, "TOPLEFT")
 	if (not panel.lastFrame) then
-		create:SetPoint("TOP", panel, "TOP", 0, -50)
+		container:SetPoint("TOP", panel, "TOP", 0, -50)
 	else
-		create:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -30)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -30)
 	end
 
 	create:SetText(info.value)
+	create:SetWidth(200)
 
 	create:SetScript("OnClick", function()
 		if (info.callback) then
 			info.callback()
 		end
 	end)
+
+	panel.lastFrame = container
 end
 function bdCore:createBox(group, option, info, persistent)
 	local panel = cfg.config[group].lastpanel
-
 	local create = CreateFrame("EditBox",nil,panel)
-	--create:SetPoint("TOP", panel.lastFrame, "BOTTOM", -10, 100)
+	local container = CreateFrame("frame",nil,panel)
+	container:SetSize(configdims.rightwidth,30)
+
 	create:SetSize(200,20)
 	bdCore:setBackdrop(create)
 	create.background:SetVertexColor(.10,.14,.17,1)
@@ -488,10 +495,11 @@ function bdCore:createBox(group, option, info, persistent)
 	create:SetScript("OnEnterPressed", function(self, key) create.button:Click() end)
 	create:SetScript("OnEscapePressed", function(self, key) self:ClearFocus() end)
 
+	create:SetPoint("TOPLEFT", container, "TOPLEFT", 5, 0)
 	if (not panel.lastFrame) then
-		create:SetPoint("TOP", panel, "TOP", 0, -50)
+		container:SetPoint("TOP", panel, "TOP", 0, -50)
 	else
-		create:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -30)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -30)
 	end
 
 	create.label = create:CreateFontString(nil)
@@ -502,6 +510,7 @@ function bdCore:createBox(group, option, info, persistent)
 	create.button = CreateFrame("Button", nil, create, "UIPanelButtonTemplate")
 	create.button:SetPoint("LEFT", create, "RIGHT", 4, 0)
 	create.button:SetText(info.button)
+	create.button:SetWidth(120)
 	create.button:SetScript("OnClick", function()
 		if (info.callback) then
 			info:callback(create:GetText())
@@ -509,7 +518,7 @@ function bdCore:createBox(group, option, info, persistent)
 		end
 	end)
 
-	panel.lastFrame = create
+	panel.lastFrame = container
 
 	return create
 end

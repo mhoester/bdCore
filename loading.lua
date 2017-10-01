@@ -20,24 +20,26 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		-- create default profile
 		if (not BD_profiles) then
 			BD_profiles = {}
-			BD_profiles['default'] = c
+
+			if (bdCoreData) then
+				BD_profiles['default'] = bdCoreData
+			else
+				BD_profiles['default'] = c
+			end
 
 		end
 		c.profiles = BD_profiles
-		print("current profile", c.profiles)
 
 		-- create this characters configuration
-		if (not BD_users or not BD_users[bdCore.name] or not BD_users[bdCore.name].profile) then
-			BD_users = {}
-			BD_users[bdCore.name] = {}
-			BD_users[bdCore.name].profile = "default"
+		if (not BD_user or not BD_user.profile) then
+			BD_user = {}
+			BD_user.profile = "default"
 
 			first = true; -- trigger first time run screen
-
 		end
-		c.user = BD_users[bdCore.name]
+		c.user = BD_user
 		c.user.profile = c.user.profile or "default"
-		print("current user profile", c.user.profile)
+
 		-- Scope current profile
 		c.profile = c.profiles[c.user.profile]
 		c.profile.positions = c.profiles[c.user.profile].positions or {}
@@ -58,7 +60,6 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		end
 
 		c.persistent = BD_persistent
-		print("current persistent", c.persistent)
 		c.persistent.auras = c.persistent.auras or {}
 		c.persistent.raid = c.persistent.auras.raid or {}
 		c.persistent.whitelist = c.persistent.auras.whitelist or {}
@@ -97,6 +98,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 
 		if (first) then
 			bdCore:triggerEvent('bd_first_run')
+			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that part of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
 		end
 		
 		bdCore:addModule("General", bdCore.general)

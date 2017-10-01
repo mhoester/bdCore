@@ -305,32 +305,6 @@ function in_table ( e, t )
 	return false
 end
 
--- kill textures
-
---[[
-function bdCore:stripTextures(object, text)
-	for i = 1, object:GetNumRegions() do
-		local region = select(i, object:GetRegions())
-		
-		if region:GetObjectType() == "Texture" then
-			region:SetTexture(nil)
-		elseif (text) then
-			region:Hide(0)
-			region:SetAlpha(0)
-		end
-	end
-end
-
--- kill frame
-function bdCore:kill(object)
-	if object.UnregisterAllEvents then
-		object:UnregisterAllEvents()
-	end
-	object.Show = function() return end
-	object:Hide()
-	object = nil
-end--]]
-
 -- set up slash commands
 function bdCore:setSlashCommand(name, func, ...)
     SlashCmdList[name] = func
@@ -351,10 +325,10 @@ end
 -- filter debuffs/buffs
 function bdCore:filterAura(name,caster,invert)
 	--local name = string.lower(name)
-	local blacklist = c.persistent["Auras"]["blacklist"]
-	local whitelist = c.persistent["Auras"]["whitelist"]
-	local mine = c.persistent["Auras"]["mine"]
-	local class = c.persistent["Auras"][bdCore.class]
+	local blacklist = BD_persistent["Auras"]["blacklist"]
+	local whitelist = BD_persistent["Auras"]["whitelist"]
+	local mine = BD_persistent["Auras"]["mine"]
+	local class = BD_persistent["Auras"][bdCore.class]
 	
 	-- raid variables are set in a file, they can be blacklisted though, and added to through whitelist
 	local raid = bdCore.auras.raid
@@ -366,16 +340,16 @@ function bdCore:filterAura(name,caster,invert)
 	end
 	
 	
-	if (blacklist and blacklist[name] == true) then
+	if (whitelist and whitelist[name]) then
+		allow = true
+	elseif (raid and raid[name]) then
+		allow = true
+	elseif (mine and mine[name] and caster == "player") then
+		allow = true
+	elseif (class and class[name]) then
+		allow = true
+	elseif (blacklist and blacklist[name]) then
 		allow = false
-	elseif (whitelist and whitelist[name] == true) then
-		allow = true
-	elseif (raid and raid[name] == true) then
-		allow = true
-	elseif (mine and mine[name] == true and caster == "player") then
-		allow = true
-	elseif (class and class[name] == true) then
-		allow = true
 	end
 	
 	return allow

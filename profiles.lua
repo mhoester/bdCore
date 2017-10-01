@@ -2,7 +2,6 @@ local bdCore, c, f = select(2, ...):unpack()
 
 local config = {}
 local function profileDropdown(dropdown) 
-	print(dropdown, "profileDropdown")
 
 	local profile_table = {}
 	for k, v in pairs(c.profiles) do
@@ -15,8 +14,6 @@ local function profileDropdown(dropdown)
 end
 
 local function profileChange(value)
-	print("profile change", value)
-
 	c.user.profile = value
 
 	c.profile = c.profiles[c.user.profile]
@@ -25,7 +22,6 @@ local function profileChange(value)
 end
 
 local function addProfile(value) 
-	print("add profile", value)
 
 	c.profiles[value] = c.profile
 
@@ -71,8 +67,6 @@ bdCore:hookEvent('profile_config',function()
 		type = "dropdown",
 		value = c.user.profile,
 		override = true,
-		button = "Create & Copy",
-		description = "Create New Profile: ",
 		options = profile_table,
 		update = function(dropdown) profileDropdown(dropdown) end,
 		updateOn = "bd_update_profiles",
@@ -82,25 +76,19 @@ bdCore:hookEvent('profile_config',function()
 	defaults[#defaults+1] = {createprofile = {
 		type = "createbox",
 		value = placeholder,
+		button = "Create & Copy",
+		description = "Create New Profile: ",
 		tooltip = "Your currently selected profile.",
 		callback = function(self, value) addProfile(value) end
 	}}
 	defaults[#defaults+1] = {deleteprofile = {
 		type = "actionbutton",
-		value = "Delete Profile",
+		value = "Delete Current Profile",
 		callback = function(self) deleteProfile() end
 	}}
 
 	bdCore:addModule("Profiles", defaults)
 	config = bdCore.config.profile['Profiles']
-
-
-	-- current profile form
-	
-
-	-- copy profile form
-
-	-- delete profile form
 
 	
 	

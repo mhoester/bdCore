@@ -60,6 +60,10 @@ bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
 	type="tab",
 	value="Whitelist"
 }}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {text = {
+	type="text",
+	value="Nothing is shown by default, add an aura to this list to have it show up. Useful for personal cooldowns, raid encounter debuffs, or other player auras."
+}}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {whitelist = {
 	type = "list",
 	value = bdCore.auras.whitelist,
@@ -70,6 +74,10 @@ bdCore.auraconfig[#bdCore.auraconfig+1] = {whitelist = {
 bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
 	type="tab",
 	value="My Casts"
+}}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {text = {
+	type="text",
+	value="Shows spells that are cast only by you."
 }}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {mine = {
 	type = "list",
@@ -82,6 +90,10 @@ bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
 	type="tab",
 	value="All "..bdCore.class.." Auras"
 }}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {text = {
+	type="text",
+	value="Shows spells that are cast only by the class you are currently playing. IE show paladin beacons while you are a paladin."
+}}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {[bdCore.class] = {
 	type = "list",
 	value = bdCore.auras['Personal Auras'][bdCore.class],
@@ -93,9 +105,13 @@ bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
 	type="tab",
 	value="Blacklist"
 }}
+bdCore.auraconfig[#bdCore.auraconfig+1] = {text = {
+	type="text",
+	value="The blacklist overrides all previous aura configurations and hides an aura if its in this list."
+}}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {blacklist = {
 	type = "list",
-	value = bdCore.auras.whitelist,
+	value = bdCore.auras.blacklist,
 	label = "Blacklisted Auras",
 }}
 
