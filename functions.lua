@@ -5,7 +5,7 @@ bdCore.moveFrames = {}
 -- add to our movable list
 function bdCore:makeMovable(frame,resize)
 	if not resize then resize = true end
-	local border = c.profile['General'].border
+	local border = c.persistent['General'].border
 	local name = frame:GetName();
 	local height = frame:GetHeight()
 	local width = frame:GetWidth()
@@ -31,7 +31,7 @@ function bdCore:makeMovable(frame,resize)
 	moveContainer:SetAlpha(0)
 	
 	bdCore:hookEvent("frames_resized,bdcore_redraw", function()
-		local border = bdCore.config['General'].border
+		local border = c.persistent['General'].border
 		local height = frame:GetHeight()
 		local width = frame:GetWidth()
 		moveContainer:SetSize(width+border, height+border)
@@ -236,7 +236,7 @@ function bdCore:setBackdrop(frame,resize)
 	
 	if (resize ~= false) then
 		bdCore:hookEvent("bdcore_redraw",function()
-			local border = bdCore.config['General'].border or bdCore.general.border
+			local border = c.persistent['General'].border or bdCore.general.border
 			
 			frame.border:SetPoint("TOPLEFT", frame, "TOPLEFT", -border, border)
 			frame.border:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", border, -border)
@@ -382,7 +382,7 @@ SlashCmdList["BDCORE"] = function(msg, editbox)
 	elseif (msg == "unlock" or msg == "lock") then
 		bdCore.toggleLock()
 	elseif (msg == "reset") then
-		BD_users = nil
+		BD_user = nil
 		BD_profiles = nil
 
 		ReloadUI()

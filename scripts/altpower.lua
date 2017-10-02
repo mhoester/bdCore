@@ -1,3 +1,4 @@
+local bdCore, c, f = select(2, ...):unpack()
 local media = bdCore.media
 
 bdCore:hookEvent("loaded_bdcore", function()
@@ -22,7 +23,7 @@ bdCore:hookEvent("loaded_bdcore", function()
 	powerbar:RegisterEvent("UNIT_POWER_BAR_HIDE")
 	powerbar:RegisterEvent("PLAYER_ENTERING_WORLD")
 	powerbar:SetScript("OnEvent", function(self, event, arg1)
-		if (not bdCore.config.profile.General.alteratepowerbar) then 
+		if (not c.persistent.General.alteratepowerbar) then 
 			PlayerPowerBarAlt:RegisterEvent("UNIT_POWER_BAR_SHOW")
 			PlayerPowerBarAlt:RegisterEvent("UNIT_POWER_BAR_HIDE")
 			PlayerPowerBarAlt:RegisterEvent("PLAYER_ENTERING_WORLD")

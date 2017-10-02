@@ -35,7 +35,7 @@ CHAT_FONT_HEIGHTS = {12, 13, 14, 15, 16, 17, 18, 19, 20}
 
 -- Base fonts
 bdCore:hookEvent("loaded_bdcore", function()
-	if (not c.profile.General.changefonts) then return end
+	if (not c.persistent.General.changefonts) then return end
 	
 	UNIT_NAME_FONT = NORMAL
 	DAMAGE_TEXT_FONT = COMBAT

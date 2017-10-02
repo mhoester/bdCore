@@ -984,7 +984,8 @@ function bdCore:createSlider(group, option, info, persistent)
 	_G[slider:GetName() .. 'Text']:SetFont(media.font, 14)
 	slider.value = slider:CreateFontString(nil)
 	slider.value:SetFont(media.font, 12)
-	if (info.persistent) then
+
+	if (info.persistent or persistent) then
 		slider:SetValue(c.persistent[group][option])
 		slider.value:SetText(c.persistent[group][option])
 	else

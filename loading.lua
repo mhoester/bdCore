@@ -36,7 +36,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 
 		-- Scope current profile
 		c.profile = c.profiles[c.user.profile]
-		c.profile.positions = c.profiles[c.user.profile].positions or {}
+		c.profile.positions = c.profile.positions or {}
 
 		-- add profile config here, before we set any defaults below
 		bdCore:triggerEvent('profile_config')
