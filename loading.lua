@@ -19,12 +19,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 		-- create default profile
 		if (not BD_profiles) then
 			BD_profiles = {}
-
-			if (bdCoreData) then
-				BD_profiles['default'] = bdCoreData
-			else
-				BD_profiles['default'] = c
-			end
+			BD_profiles['default'] = c
 
 			first = true; -- trigger first time run screen
 		end
@@ -97,7 +92,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 
 		if (first) then
 			bdCore:triggerEvent('bd_first_run')
-			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that part of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
+			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that most of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
 		end
 		
 		bdCore:addModule("General", bdCore.general, true)
