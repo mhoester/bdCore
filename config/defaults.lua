@@ -54,6 +54,11 @@ bdCore.general[#bdCore.general+1] = {alteratepowerbar = {
 	value = true,
 	label = "Use Alternate Power Bar",
 }}
+bdCore.general[#bdCore.general+1] = {forcescale = {
+	type = "checkbox",
+	value = false,
+	label = "Force UI scale for pixel perfect borders",
+}}
 
 bdCore.auraconfig = {}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {

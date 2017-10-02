@@ -8,10 +8,9 @@ bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 	-- set UIScale manually, since the CVAR won't let you go beneath 0.64 (why blizz??)
 	if (not InCombatLockdown()) then
-		--SetCVar("uiScale", bdCore.scale)
-		--SetCVar("useUIScale", 0)
-		--SetCVar("uiScaleMultiplier", -1)
-		UIParent:SetScale(bdCore.scale)
+		if (BD_persistent and BD_persistent['General'] and BD_persistent['General'].forcescale) then
+			UIParent:SetScale(bdCore.scale)
+		end
 	end
 
 	if (event == "ADDON_LOADED" and (arg1 == "bdCore" or arg1 == "bdcore")) then
@@ -27,6 +26,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 				BD_profiles['default'] = c
 			end
 
+			first = true; -- trigger first time run screen
 		end
 		c.profiles = BD_profiles
 
@@ -35,7 +35,6 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 			BD_user = {}
 			BD_user.profile = "default"
 
-			first = true; -- trigger first time run screen
 		end
 		c.user = BD_user
 		c.user.profile = c.user.profile or "default"
@@ -101,7 +100,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that part of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
 		end
 		
-		bdCore:addModule("General", bdCore.general)
+		bdCore:addModule("General", bdCore.general, true)
 		
 		bdCore:triggerEvent('loaded_bdcore')
 		
