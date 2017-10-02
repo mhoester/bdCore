@@ -1,11 +1,12 @@
-## Interface: 72000
+## Interface: 73000
 ## Title: |cffA02C2Fbd|rCore
 ## Version: 0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
+## SavedVariables: bdCoreData
 ## SavedVariables: BD_persistent
-## SavedVariables: BD_users
 ## SavedVariables: BD_profiles
+## SavedVariablesPerCharacter: BD_user
 
 core.lua
 

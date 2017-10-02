@@ -4,70 +4,72 @@ bdCore:RegisterEvent("ADDON_LOADED")
 bdCore:RegisterEvent("PLAYER_REGEN_ENABLED")
 bdCore:RegisterEvent("PLAYER_REGEN_DISABLED")
 bdCore:RegisterEvent("LOADING_SCREEN_DISABLED")
+--bdCore:RegisterEvent("PLAYER_ENTERING_WORLD")
 bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
-
 	-- set UIScale manually, since the CVAR won't let you go beneath 0.64 (why blizz??)
 	if (not InCombatLockdown()) then
-		SetCVar("uiScale", bdCore.scale)
-		SetCVar("useUIScale", 0)
-		SetCVar("uiScaleMultiplier", -1)
-		UIParent:SetScale(bdCore.scale)
+		if (BD_persistent and BD_persistent['General'] and BD_persistent['General'].forcescale) then
+			UIParent:SetScale(bdCore.scale)
+		end
 	end
 
 	if (event == "ADDON_LOADED" and (arg1 == "bdCore" or arg1 == "bdcore")) then
 
 		local first = false
 		-- create default profile
-		if (not BD_profiles['default'] ) then
-			BD_profiles['default'] = c
+		if (not BD_profiles) then
+			BD_profiles = {}
 
-			c.profiles = BD_profiles
-
-			print("current profile", c.profiles)
-		end
-
-		-- create this characters configuration
-		if (not BD_users[bdCore.name] ) then
-			BD_users[bdCore.name] = {}
-
-			c.user = BD_users[bdCore.name]
-
-			c.user.profile = "default"
-			c.user.profile_spec = false
-			c.user.profile_spec[1] = false
-			c.user.profile_spec[2] = false
-			c.user.profile_spec[3] = false
-			c.user.profile_spec[4] = false
+			if (bdCoreData) then
+				BD_profiles['default'] = bdCoreData
+			else
+				BD_profiles['default'] = c
+			end
 
 			first = true; -- trigger first time run screen
-
-			print("current user profile", c.user)
 		end
+		c.profiles = BD_profiles
+
+		-- create this characters configuration
+		if (not BD_user or not BD_user.profile) then
+			BD_user = {}
+			BD_user.profile = "default"
+
+		end
+		c.user = BD_user
+		c.user.profile = c.user.profile or "default"
+
+		-- Scope current profile
+		c.profile = c.profiles[c.user.profile]
+		c.profile.positions = c.profiles[c.user.profile].positions or {}
+
+		-- add profile config here, before we set any defaults below
+		bdCore:triggerEvent('profile_config')
+
+		c.user.profile_spec = c.user.profile_spec or {}
+		c.user.profile_spec.current = c.user.profile_spec.current or false
+		c.user.profile_spec[1] = c.user.profile_spec[1] or false
+		c.user.profile_spec[2] = c.user.profile_spec[2] or false
+		c.user.profile_spec[3] = c.user.profile_spec[3] or false
+		c.user.profile_spec[4] = c.user.profile_spec[4] or false
 
 		-- things that are not profile specific
 		if (not BD_persistent ) then
 			BD_persistent = {}
-			c.persistent = BD_persistent
-			c.persistent.auras = {}
-			c.persistent.auras.raid = {}
-			c.persistent.auras.whitelist = {}
-			c.persistent.auras.blacklist = {}
-			c.persistent.auras.mine = {}
-			c.persistent.auras.class[bdCore.class] = {}
-			c.persistent.gmotd = {}
-			c.persistent.goldtrack = {}
-
-			print("current persistent", c.persistent)
 		end
 
-		-- reference SavedVariables in the c namespace
 		c.persistent = BD_persistent
-		c.user = BD_users[bdCore.name]
-		c.profiles = BD_profiles
-
-		-- Scope current profile
-		c.profile = c.profiles[c.user.profile]
-		c.profile.positions = c.profile.positions or {}
+		c.persistent.auras = c.persistent.auras or {}
+		c.persistent.raid = c.persistent.auras.raid or {}
+		c.persistent.whitelist = c.persistent.auras.whitelist or {}
+		c.persistent.blacklist = c.persistent.auras.blacklist or {}
+		c.persistent.mine = c.persistent.auras.mine or {}
+		c.persistent.auras.class = c.persistent.auras.class or {}
+		c.persistent.auras.class[bdCore.class] = c.persistent.auras.class[bdCore.class] or {}
+		
+		c.persistent.gmotd = c.persistent.gmotd or {}
+		c.persistent.goldtrack = c.persistent.goldtrack or {}
+		
 	
 		-- we shouldn't need this since lua references automatically the same table?
 		-- when we update the default configuration, those new configurations should be copied over
@@ -93,13 +95,12 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 			end
 		end--]]
 
-		bdCore:triggerEvent('profile_config')
-
 		if (first) then
 			bdCore:triggerEvent('bd_first_run')
+			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that part of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
 		end
 		
-		bdCore:addModule("General", bdCore.general)
+		bdCore:addModule("General", bdCore.general, true)
 		
 		bdCore:triggerEvent('loaded_bdcore')
 		

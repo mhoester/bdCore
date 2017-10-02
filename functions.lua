@@ -5,11 +5,13 @@ bdCore.moveFrames = {}
 -- add to our movable list
 function bdCore:makeMovable(frame,resize)
 	if not resize then resize = true end
-	local border = bdCore.config['General'].border
+	local border = c.profile['General'].border
 	local name = frame:GetName();
 	local height = frame:GetHeight()
 	local width = frame:GetWidth()
 	local point, relativeTo, relativePoint, xOfs, yOfs = frame:GetPoint()
+	relativeTo = relativeTo:GetName()
+
 	local moveContainer = CreateFrame("frame", "bdCore_"..name, UIParent)
 	moveContainer.text = moveContainer:CreateFontString(moveContainer:GetName().."_Text")
 	moveContainer.frame = frame
@@ -24,10 +26,10 @@ function bdCore:makeMovable(frame,resize)
 	moveContainer:SetSize(width+4, height+4)
 	moveContainer:SetBackdrop({bgFile = bdCore.media.flat})
 	moveContainer:SetBackdropColor(0,0,0,.6)
-	moveContainer:SetMovable(true)
 	moveContainer:SetFrameStrata("BACKGROUND")
 	moveContainer:SetClampedToScreen(true)
 	moveContainer:SetAlpha(0)
+	
 	bdCore:hookEvent("frames_resized,bdcore_redraw", function()
 		local border = bdCore.config['General'].border
 		local height = frame:GetHeight()
@@ -37,11 +39,12 @@ function bdCore:makeMovable(frame,resize)
 	 
 	function moveContainer.dragStop(self)
 		self:StopMovingOrSizing()
-		c.sv.positions[self.frame:GetName()] = {self:GetPoint()}
+		local point, relativeTo, relativePoint, xOfs, yOfs = moveContainer:GetPoint()
+		if (not relativeTo) then relativeTo = UIParent end
+		relativeTo = relativeTo:GetName()
+
+		c.profile.positions[self.frame:GetName()] = {point, relativeTo, relativePoint, xOfs, yOfs}
 	end
-	
-	frame:ClearAllPoints()
-	frame:SetPoint("TOPRIGHT", moveContainer, "TOPRIGHT", -2, -2)
 	
 	moveContainer.text:SetFont(bdCore.media.font, 16)
 	moveContainer.text:SetPoint("CENTER", moveContainer, "CENTER", 0, 0)
@@ -50,11 +53,22 @@ function bdCore:makeMovable(frame,resize)
 	moveContainer.text:SetAlpha(0.8)
 	moveContainer.text:Hide()
 	
-	if (c.sv.positions[name]) then
-		moveContainer:SetPoint(unpack(c.sv.positions[name]))
-	else
-		moveContainer:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+	-- on profile swaps
+	moveContainer.position = function(self)
+		moveContainer:ClearAllPoints()
+		if (c.profile.positions[name]) then
+			local point, relativeTo, relativePoint, xOfs, yOfs = unpack(c.profile.positions[name])
+			relativeTo = _G[relativeTo]
+			moveContainer:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+		else
+			moveContainer:SetPoint(point, relativeTo, relativePoint, xOfs, yOfs)
+		end
 	end
+	moveContainer:position()
+	bdCore:hookEvent("bd_reconfig", moveContainer.position)
+
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPRIGHT", moveContainer, "TOPRIGHT", -2, -2)
 	
 	bdCore.moveFrames[#bdCore.moveFrames+1] = moveContainer
 	return moveContainer
@@ -78,6 +92,8 @@ function bdCore:toggleLock()
 			frame:SetAlpha(1)
 			frame.text:Show()
 			frame:EnableMouse(true)
+			frame:SetMovable(true)
+			frame:SetUserPlaced(false)
 			frame:RegisterForDrag("LeftButton","RightButton")
 			frame:SetScript("OnDragStart", function(self) self:StartMoving() end)
 			frame:SetScript("OnDragStop", function(self) self:dragStop(self) end)
@@ -88,6 +104,8 @@ function bdCore:toggleLock()
 			frame:EnableMouse(false)
 			frame:SetScript("OnDragStart", function(self) self:StopMovingOrSizing() end)
 			frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing() end)
+			frame:SetUserPlaced(false)
+			frame:SetMovable(false)
 			frame:SetFrameStrata("BACKGROUND")
 			
 		end
@@ -287,32 +305,6 @@ function in_table ( e, t )
 	return false
 end
 
--- kill textures
-
---[[
-function bdCore:stripTextures(object, text)
-	for i = 1, object:GetNumRegions() do
-		local region = select(i, object:GetRegions())
-		
-		if region:GetObjectType() == "Texture" then
-			region:SetTexture(nil)
-		elseif (text) then
-			region:Hide(0)
-			region:SetAlpha(0)
-		end
-	end
-end
-
--- kill frame
-function bdCore:kill(object)
-	if object.UnregisterAllEvents then
-		object:UnregisterAllEvents()
-	end
-	object.Show = function() return end
-	object:Hide()
-	object = nil
-end--]]
-
 -- set up slash commands
 function bdCore:setSlashCommand(name, func, ...)
     SlashCmdList[name] = func
@@ -322,7 +314,7 @@ function bdCore:setSlashCommand(name, func, ...)
 end
 
 function bdCore:isBlacklisted(name,caster)
-	local blacklist = c.sv["Auras"]["blacklist"]
+	local blacklist = c.persistent["Auras"]["blacklist"]
 	
 	if (blacklist[name]) then
 		return true
@@ -333,10 +325,10 @@ end
 -- filter debuffs/buffs
 function bdCore:filterAura(name,caster,invert)
 	--local name = string.lower(name)
-	local blacklist = c.sv["Auras"]["blacklist"]
-	local whitelist = c.sv["Auras"]["whitelist"]
-	local mine = c.sv["Auras"]["mine"]
-	local class = c.sv["Auras"][bdCore.class]
+	local blacklist = BD_persistent["Auras"]["blacklist"]
+	local whitelist = BD_persistent["Auras"]["whitelist"]
+	local mine = BD_persistent["Auras"]["mine"]
+	local class = BD_persistent["Auras"][bdCore.class]
 	
 	-- raid variables are set in a file, they can be blacklisted though, and added to through whitelist
 	local raid = bdCore.auras.raid
@@ -348,16 +340,16 @@ function bdCore:filterAura(name,caster,invert)
 	end
 	
 	
-	if (blacklist and blacklist[name] == true) then
+	if (whitelist and whitelist[name]) then
+		allow = true
+	elseif (raid and raid[name]) then
+		allow = true
+	elseif (mine and mine[name] and caster == "player") then
+		allow = true
+	elseif (class and class[name]) then
+		allow = true
+	elseif (blacklist and blacklist[name]) then
 		allow = false
-	elseif (whitelist and whitelist[name] == true) then
-		allow = true
-	elseif (raid and raid[name] == true) then
-		allow = true
-	elseif (mine and mine[name] == true and caster == "player") then
-		allow = true
-	elseif (class and class[name] == true) then
-		allow = true
 	end
 	
 	return allow
@@ -390,10 +382,9 @@ SlashCmdList["BDCORE"] = function(msg, editbox)
 	elseif (msg == "unlock" or msg == "lock") then
 		bdCore.toggleLock()
 	elseif (msg == "reset") then
-		bdCoreDataPerChar = nil
-		for k, frame in pairs(bdCore.moveFrames) do
-			frame:SetUserPlaced(false)
-		end
+		BD_users = nil
+		BD_profiles = nil
+
 		ReloadUI()
 	elseif (msg == "config") then
 		bdCore:toggleConfig()

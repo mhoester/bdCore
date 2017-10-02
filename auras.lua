@@ -231,6 +231,7 @@ bdCore.auras.raid = {
 	['Lingering Eruption'] = true,
 	['Lingering Wail'] = true,
 	['Soul Anguish'] = true,
+	['Focused Dreadflame'] = true,
 }
 
 bdCore.auras.whitelist = {
@@ -457,7 +458,7 @@ bdCore.auras.mine = {
 	["Beacon of Virtue"] = true,
 	["Beacon of Light"] = true,
 	["Beacon of Faith"] = true,
-
+	
 	-- Priest
 	["Weakened Soul"] = true,
 	["Renew"] = true,

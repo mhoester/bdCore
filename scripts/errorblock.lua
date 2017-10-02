@@ -36,7 +36,7 @@ local filter = {
 local errors = CreateFrame('frame')
 
 UIErrorsFrame:SetScript("OnEvent", function(self, event, msg, ...)
-	if (bdCore.config.General.errorblock) then
+	if (bdCore.config.profile.General.errorblock) then
 		if event == "UI_ERROR_MESSAGE" then
 			if filter[msg] then
 				return
