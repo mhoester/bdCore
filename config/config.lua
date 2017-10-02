@@ -553,10 +553,11 @@ function bdCore:colorPicker(group, option, info, persistent)
 	
 	picker:SetScript("OnClick",function()		
 		HideUIPanel(ColorPickerFrame)
+		local r,g,b,a
 		if (info.persistent or persistent) then
-			local r,g,b,a = unpack(c.persistent[group][option])
+			r,g,b,a = unpack(c.persistent[group][option])
 		else
-			local r,g,b,a = unpack(c.profile[group][option])
+			r,g,b,a = unpack(c.profile[group][option])
 		end
 		ColorPickerFrame:SetFrameStrata("FULLSCREEN_DIALOG")
 		ColorPickerFrame:SetClampedToScreen(true)
