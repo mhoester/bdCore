@@ -92,7 +92,7 @@ bdCore:SetScript("OnEvent", function(self, event, arg1, arg2, ...)
 
 		if (first) then
 			bdCore:triggerEvent('bd_first_run')
-			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that most of your configurations have been reset. Type /bd config or click the minimap button to open the profiles page and start making changes.")
+			print("The latest bdCore update completely revamps the way it saves your configurations, and now supports profiles! Unfortuantely this means that most of your configurations have been reset. If you experience big issues, make sure that all your bd addons are updated, and then type /bd reset to start fresh. Type /bd config or click the minimap button to open the profiles page and start making changes.")
 		end
 		
 		bdCore:addModule("General", bdCore.general, true)
