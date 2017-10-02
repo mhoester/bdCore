@@ -11,7 +11,7 @@ end
 
 interrupt:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 local function OnEvent(self, event, ...)
-	if (not bdCore.config.General.interrupt) then return end
+	if (not bdCore.config.persistent.General.interrupt) then return end
 	if (select(2,...) ~= 'SPELL_INTERRUPT') then return end
 	if (select(5,...) ~= UnitName('player')) then return end
 	local class, classFileName = UnitClass("player")
