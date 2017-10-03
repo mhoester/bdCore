@@ -9,8 +9,6 @@ engine[1]:RegisterEvent("ADDON_LOADED")
 engine[1].class = string.lower(select(1, UnitClass('player')))
 engine[1].name = string.lower(UnitName('player'))
 
-engine[1].scale = 768/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)")
-
 local roleupdate = CreateFrame("frame",nil)
 roleupdate:RegisterEvent("LFG_ROLE_UPDATE")
 roleupdate:RegisterEvent("PLAYER_ROLES_ASSIGNED")
@@ -24,8 +22,6 @@ roleupdate:SetScript("OnEvent", function(self, event, arg)
 	
 	end
 end)
-
-
 
 function engine:unpack()
 	return self[1], self[2], self[3]
