@@ -1,3 +1,4 @@
+local bdCore, c, f = select(2, ...):unpack()
 -- double click buyout
 local dcbo = CreateFrame('frame')
 

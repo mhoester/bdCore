@@ -3,6 +3,8 @@ local bdCore, c, f = select(2, ...):unpack()
 
 bdCore.auras = {}
 bdCore.auras.raid = {
+	['Grievous Wound'] = true,
+
 	----------------------------------------------------
 	-- Emerald Nightmare
 	----------------------------------------------------
@@ -440,6 +442,7 @@ bdCore.auras.mine = {
 	['Renewing Mist'] = true,
 	['Soothing Mist'] = true,
 	['Essence Font'] = true,
+	['Enveloping Mist'] = true,
 
 	-- Shamans
 	['Riptide'] = true,
