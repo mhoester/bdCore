@@ -33,6 +33,10 @@ local OnRangeFrame
 
 local UnitInRange, UnitIsConnected = UnitInRange, UnitIsConnected
 
+-- Some classes have unique spell ranges, like resto druids with chest or a talent.
+local spellCheck = {}
+spellCheck['DRUID'] = select(1, GetSpellInfo(50769))
+
 local function Update(self, event)
 	local element = self.Range
 	local unit = self.unit
@@ -49,11 +53,21 @@ local function Update(self, event)
 	local inRange, checkedRange
 	local connected = UnitIsConnected(unit)
 	if(connected) then
-		inRange, checkedRange = UnitInRange(unit)
-		if(checkedRange and not inRange) then
-			self:SetAlpha(element.outsideAlpha)
+		-- Support range checking by spell
+		local class = select(2, UnitClass(unit))
+		if (spellCheck[class]) then
+			if (IsSpellInRange(spellCheck[class], unit) == 1) then
+				self:SetAlpha(element.insideAlpha)
+			else
+				self:SetAlpha(element.outsideAlpha)
+			end
 		else
-			self:SetAlpha(element.insideAlpha)
+			inRange, checkedRange = UnitInRange(unit)
+			if(checkedRange and not inRange) then
+				self:SetAlpha(element.outsideAlpha)
+			else
+				self:SetAlpha(element.insideAlpha)
+			end
 		end
 	else
 		self:SetAlpha(element.insideAlpha)
