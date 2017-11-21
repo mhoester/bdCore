@@ -344,7 +344,7 @@ function bdCore:filterAura(name,caster,invert)
 		allow = true
 	elseif (raid and raid[name]) then
 		allow = true
-	elseif (mine and mine[name] and caster == "player") then
+	elseif (mine and mine[name] and caster and caster == "player") then
 		allow = true
 	elseif (class and class[name]) then
 		allow = true

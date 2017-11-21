@@ -28,37 +28,49 @@ bdCore.general[#bdCore.general+1] = {border = {
 	callback = function() bdCore:triggerEvent("bdcore_redraw") end
 }}
 
-bdCore.general[#bdCore.general+1] = {errorblock = {
-	type = "checkbox",
-	value = true,
-	label = "Block Red Error Text Spam",
+-- general
+	bdCore.general[#bdCore.general+1] = {errorblock = {
+		type = "checkbox",
+		value = true,
+		label = "Block Red Error Text Spam",
+	}}
+	bdCore.general[#bdCore.general+1] = {changefonts = {
+		type = "checkbox",
+		value = true,
+		label = "Change UI Fonts",
+	}}
+	bdCore.general[#bdCore.general+1] = {interrupt = {
+		type = "checkbox",
+		value = true,
+		label = "Announce Interrupts",
+	}}
+	bdCore.general[#bdCore.general+1] = {doubleclickbo = {
+		type = "checkbox",
+		value = true,
+		label = "Double Click buyout",
+		tooltip = "When double clicking on an auction it will buyout.",
+	}}
+	bdCore.general[#bdCore.general+1] = {alteratepowerbar = {
+		type = "checkbox",
+		value = true,
+		label = "Use Alternate Power Bar",
+	}}
+	bdCore.general[#bdCore.general+1] = {forcescale = {
+		type = "checkbox",
+		value = false,
+		label = "Force UI scale for pixel perfect borders",
+	}}
+
+-- skinning
+bdCore.general[#bdCore.general+1] = {tab = {
+	type = "tab",
+	value = "Skinning"
 }}
-bdCore.general[#bdCore.general+1] = {changefonts = {
-	type = "checkbox",
-	value = true,
-	label = "Change UI Fonts",
-}}
-bdCore.general[#bdCore.general+1] = {interrupt = {
-	type = "checkbox",
-	value = true,
-	label = "Announce Interrupts",
-}}
-bdCore.general[#bdCore.general+1] = {doubleclickbo = {
-	type = "checkbox",
-	value = true,
-	label = "Double Click buyout",
-	tooltip = "When double clicking on an auction it will buyout.",
-}}
-bdCore.general[#bdCore.general+1] = {alteratepowerbar = {
-	type = "checkbox",
-	value = true,
-	label = "Use Alternate Power Bar",
-}}
-bdCore.general[#bdCore.general+1] = {forcescale = {
-	type = "checkbox",
-	value = false,
-	label = "Force UI scale for pixel perfect borders",
-}}
+	bdCore.general[#bdCore.general+1] = {skinwas = {
+		type = "checkbox",
+		value = false,
+		label = "Skin Weak Auras to bd Style",
+	}}
 
 bdCore.auraconfig = {}
 bdCore.auraconfig[#bdCore.auraconfig+1] = {tab = {
