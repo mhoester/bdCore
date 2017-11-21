@@ -13,10 +13,10 @@ interrupt:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 local function OnEvent(self, event, ...)
 	if (not BD_persistent.General.interrupt) then return end
 	if (select(2,...) ~= 'SPELL_INTERRUPT') then return end
-	if (select(5,...) ~= UnitName('player')) then return end
-	local class, classFileName = UnitClass("player")
-	local colors = RAID_CLASS_COLORS[classFileName]
-	local hex = RGBPercToHex(colors.r,colors.g,colors.b)
+	if (not UnitIsUnit(select(5,...), 'player') ) then return end
+	--local class, classFileName = UnitClass("player")
+	--local colors = RAID_CLASS_COLORS[classFileName]
+	--local hex = RGBPercToHex(colors.r,colors.g,colors.b)
 	local arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12, arg13, arg14, arg15 = ...
 	
 	SendChatMessage(UnitName("player")..' interrupted ' .. GetSpellLink(arg15), channel)

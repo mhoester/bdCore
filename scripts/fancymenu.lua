@@ -1,64 +1,9 @@
 local bdCore, c, f = select(2, ...):unpack()
-local interrupt = CreateFrame('frame')
-local channel = 'SAY'
-
-
-local gmotd = CreateFrame("frame", nil, UIParent)
-gmotd:SetSize(350, 150)
-gmotd:Hide()
-gmotd:SetPoint("TOP", UIParent, "TOP", 0, -140)
-bdCore:setBackdrop(gmotd)
-gmotd.header = gmotd:CreateFontString(nil)
-gmotd.header:SetFont(bdCore.media.font, 14)
-gmotd.header:SetPoint("BOTTOM", gmotd, "TOP", 0, 4)
-
-gmotd.text = gmotd:CreateFontString(nil)
-gmotd.text:SetHeight(130)
-gmotd.text:SetPoint("TOPLEFT", gmotd, "TOPLEFT", 10, -10)
-gmotd.text:SetPoint("TOPRIGHT", gmotd, "TOPRIGHT", -10, -10)
-gmotd.text:SetJustifyV("TOP")
-gmotd.text:SetFont(bdCore.media.font, 13)
-gmotd.text:SetTextColor(0, 1, 0)
-gmotd.text:CanWordWrap(true)
-gmotd.text:SetWordWrap(true)
-
-gmotd.button = CreateFrame("Button", nil, gmotd)
-gmotd.button:SetText("Got it");
-bdCore:skinButton(gmotd.button,false)
-gmotd.button:SetPoint("TOP", gmotd, "BOTTOM", 0, -4)
-gmotd.button:SetScript("OnClick",function(self)
-	c.sv.gmotd = {}
-	c.sv.gmotd[gmotd.msg] = true
-	gmotd:Hide()
-end)
-
-gmotd:RegisterEvent("GUILD_MOTD")
-gmotd:RegisterEvent("GUILD_ROSTER_UPDATE")
-gmotd:SetScript("OnEvent", function(self, event, message)
-	
-	local msg
-	if (event == "GUILD_MOTD") then
-		msg = message
-	else
-		msg = GetGuildRosterMOTD()
-	end
-	
-	if (string.len(msg) > 0 and not c.sv.gmotd[msg]) then
-		gmotd.msg = msg
-		gmotd.text:SetText(msg)
-		gmotd.header:SetText(select(1, GetGuildInfo("player")).." - Message of the Day")
-		gmotd:Show()
-		local numlines = gmotd.text:GetNumLines()
-		gmotd:SetHeight(20+(12.2*numlines))
-		
-		
-	end
-end)
-
 
 local bdGameMenu = CreateFrame("frame","bdGameMenu")
 bdGameMenu:SetFrameStrata("TOOLTIP")
 bdGameMenu:SetFrameLevel(25)
+
 local r,g,b,a = unpack(bdCore.media.border)
 bdGameMenu:ClearAllPoints()
 bdGameMenu:SetPoint("TOPLEFT",UIParent,"TOPLEFT")
@@ -166,23 +111,20 @@ bdGameMenu:RegisterEvent("PLAYER_ENTERING_WORLD")
 bdGameMenu.model:SetSize(bdGameMenu:GetHeight(),bdGameMenu:GetHeight()*1.5)
 bdGameMenu.model:SetPoint("BOTTOMLEFT",bdGameMenu,"BOTTOMLEFT",-310,40)
 bdGameMenu.model:SetScale(768/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))
-bdGameMenu:SetScript("OnEvent",function()
+bdGameMenu.model.repose = function(self)
 	bdGameMenu.model:SetUnit("player")
 	bdGameMenu.model:SetRotation(math.rad(40))
+	bdGameMenu.model:SetSize(bdGameMenu:GetHeight(),bdGameMenu:GetHeight()*1.5)
+	bdGameMenu.model:SetPoint("BOTTOMLEFT",bdGameMenu,"BOTTOMLEFT",-310,40)
+	bdGameMenu.model:SetScale(768/string.match(({GetScreenResolutions()})[GetCurrentResolution()], "%d+x(%d+)"))
+end
+bdGameMenu:SetScript("OnEvent",function()
+	bdGameMenu.model:repose()
 end)
 bdGameMenu.model:SetFrameLevel(24)
 
-
---[[
-GameMenuFrame:SetAlpha(0)
-GameMenuFrame:ClearAllPoints()
-GameMenuFrame:SetScale(.001)
-GameMenuFrame:SetPoint("BOTTOMLEFT")
---]]
---[[
-
 hooksecurefunc(GameMenuFrame,"Show",function()
-	if (bdCore.config.General.fancymenu) then
+	if (not c.persistent.General.fancymenu) then
 		UIFrameFadeIn(bdGameMenu,.3,0,1)
 		UIFrameFadeIn(UIParent,.3,1,0)
 		GameMenuFrame:SetAlpha(0)
@@ -190,8 +132,7 @@ hooksecurefunc(GameMenuFrame,"Show",function()
 		GameMenuFrame:SetScale(.001)
 		GameMenuFrame:SetPoint("BOTTOMLEFT")
 
-		bdGameMenu.model:SetUnit("player")
-		bdGameMenu.model:SetRotation(math.rad(40))
+		bdGameMenu.model:repose()
 	else
 		GameMenuFrame:SetAlpha(1)
 		GameMenuFrame:SetScale(1)
@@ -207,5 +148,3 @@ hooksecurefunc(GameMenuFrame,"Hide",function()
 		UIFrameFadeOut(UIParent,.3,0,1)
 	end
 end)
-
---]]

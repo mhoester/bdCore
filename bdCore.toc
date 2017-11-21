@@ -31,3 +31,5 @@ scripts\fontchange.lua
 scripts\altpower.lua
 scripts\autohide.lua
 scripts\qol.lua
+scripts\waskin.lua
+scripts\fancymenu.lua
