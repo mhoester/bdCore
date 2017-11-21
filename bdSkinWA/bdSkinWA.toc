@@ -1,0 +1,7 @@
+## Interface: 71000
+## Title: |cffA02C2Fbd|rSkinWA
+## DefaultState: Enabled
+## LoadOnDemand: 0
+## Dependencies: bdCore
+
+core.lua
