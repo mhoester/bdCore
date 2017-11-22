@@ -11,7 +11,7 @@ autohide:SetScript("OnEvent",function(self,event,arg1)
 		return 
 	end
 
-	if (event == "ENCOUNTER_START" or (event == "LOADING_SCREEN_DISABLED" and UnitExists("boss1")) then
+	if (event == "ENCOUNTER_START" or (event == "LOADING_SCREEN_DISABLED" and UnitExists("boss1"))) then
 		ObjectiveTracker_Collapse()
 	else
 		ObjectiveTracker_Expand()

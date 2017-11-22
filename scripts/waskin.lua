@@ -1,3 +1,5 @@
+local bdCore, c, f = select(2, ...):unpack()
+
 local wa_skin = CreateFrame("Frame")
 wa_skin:RegisterEvent("ADDON_LOADED")
 wa_skin:SetScript("OnEvent", function(self, event,addon)
@@ -26,12 +28,12 @@ wa_skin:SetScript("OnEvent", function(self, event,addon)
 				frame.bar.fg:SetTexture(flat)
 
 				frame.bar.fg.SetColor = frame.bar.fg.SetVertexColor
-				frame.bar.fg.SetVertexColor = function(self, r, g, b)
+				frame.bar.fg.SetNewColor = function(self, r, g, b)
 					frame.bar.fg:SetColor(r/2, g/2, b/2)
 				end
 
 				local r, g, b = frame.bar.fg:GetVertexColor()
-				frame.bar.fg:SetVertexColor(r, g, b)
+				frame.bar.fg:SetNewColor(r, g, b)
 
 				frame.bar.fg.OffsetPoint = frame.bar.fg.SetPoint
 				frame.bar.fg.SetPoint = function(self, point)
