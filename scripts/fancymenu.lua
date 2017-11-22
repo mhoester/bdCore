@@ -9,7 +9,7 @@ bdGameMenu:ClearAllPoints()
 bdGameMenu:SetPoint("TOPLEFT",UIParent,"TOPLEFT")
 bdGameMenu:SetPoint("BOTTOMRIGHT",UIParent,"BOTTOMRIGHT")
 bdGameMenu:Hide()
-bdGameMenu:SetAlpha(1)
+bdGameMenu:SetAlpha(0)
 bdGameMenu:SetScale(.7)
 
 bdGameMenu.caret = CreateFrame("frame",nil,bdGameMenu)
@@ -126,11 +126,12 @@ bdGameMenu:SetScript("OnEvent",function()
 	bdGameMenu.model:repose()
 end)
 bdGameMenu.model:SetFrameLevel(24)
-
+--[[
 hooksecurefunc(GameMenuFrame,"Show",function()
 	if (c.persistent.General.fancymenu) then
 		UIFrameFadeOut(UIParent,.1,1,0)
-		bdGameMenu:Show()
+		UIFrameFadeIn(bdGameMenu,.1,0,1)
+		--bdGameMenu:Show()
 		GameMenuFrame:SetAlpha(0)
 		GameMenuFrame:ClearAllPoints()
 		GameMenuFrame:SetScale(.001)
@@ -148,8 +149,8 @@ end)
 
 hooksecurefunc(GameMenuFrame,"Hide",function()
 	if (c.persistent.General.fancymenu) then
-		--UIFrameFadeOut(bdGameMenu,.3,1,0)
-		bdGameMenu:Hide()
+		UIFrameFadeOut(bdGameMenu,.1,1,0)
+		--bdGameMenu:Hide()
 		UIFrameFadeIn(UIParent,.1,0,1)
 	end
-end)
+end)--]]

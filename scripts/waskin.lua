@@ -35,7 +35,28 @@ wa_skin:SetScript("OnEvent", function(self, event,addon)
 				local r, g, b = frame.bar.fg:GetVertexColor()
 				frame.bar.fg:SetNewColor(r, g, b)
 
-				frame.bar.fg.OffsetPoint = frame.bar.fg.SetPoint
+				--[[frame.bar.fg.OffsetPoint = frame.bar.fg.SetPoint
+				--hooksecurefunc(frame.bar.fg, 'SetPoint', function()
+					frame.bar.fg:ClearAllPoints()
+					if (point == "TOPLEFT") then
+						frame.bar.fg:OffsetPoint("TOPLEFT", frame.bar, "TOPLEFT", 2, -2)
+						frame.bar.fg:OffsetPoint("BOTTOMLEFT", frame.bar, "BOTTOMLEFT", 2, 2)
+					end
+					if (point == "TOPRIGHT") then
+						frame.bar.fg:OffsetPoint("TOPRIGHT", frame.bar, "TOPRIGHT", -2, -2)
+						frame.bar.fg:OffsetPoint("BOTTOMRIGHT", frame.bar, "BOTTOMRIGHT", -2, 2)
+					end
+					if (point == "BOTTOMLEFT") then
+						frame.bar.fg:OffsetPoint("TOPLEFT", frame.bar, "TOPLEFT", 2, -2)
+						frame.bar.fg:OffsetPoint("BOTTOMLEFT", frame.bar, "BOTTOMLEFT", 2, 2)
+					end
+					if (point == "BOTTOMRIGHT") then
+						frame.bar.fg:OffsetPoint("TOPRIGHT", frame.bar, "TOPRIGHT", -2, -2)
+						frame.bar.fg:OffsetPoint("BOTTOMRIGHT", frame.bar, "BOTTOMRIGHT", -2, 2)
+					end
+				--end)--]]
+
+				--[[frame.bar.fg.OffsetPoint = frame.bar.fg.SetPoint
 				frame.bar.fg.SetPoint = function(self, point)
 					frame.bar.fg:ClearAllPoints()
 					if (point == "TOPLEFT") then
@@ -54,7 +75,7 @@ wa_skin:SetScript("OnEvent", function(self, event,addon)
 						frame.bar.fg:OffsetPoint("TOPRIGHT", frame.bar, "TOPRIGHT", -2, -2)
 						frame.bar.fg:OffsetPoint("BOTTOMRIGHT", frame.bar, "BOTTOMRIGHT", -2, 2)
 					end
-				end
+				end--]]
 				
 
 				--[[frame.bar.background = frame.bar:CreateTexture(nil, "BACKGROUND", 1)
