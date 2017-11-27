@@ -2,10 +2,10 @@ local bdCore, c, f = select(2, ...):unpack()
 local media = bdCore.media
 
 local configdims = {
-	width = 634,
+	width = 740,
 	left_col = 140,
-	height = 430,
-	rightwidth = 444
+	height = 450,
+	rightwidth = 580
 }
 
 local cfg = CreateFrame( "Frame", "bdCore config", UIParent)
@@ -599,7 +599,7 @@ function bdCore:colorPicker(group, option, info, persistent)
 	if (not panel.lastFrame) then
 		container:SetPoint("TOP", panel, "TOP", 0, 0)
 	else
-		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -12)
+		container:SetPoint("TOP", panel.lastFrame, "BOTTOM", 0, -8)
 	end
 	panel.lastFrame = container
 	panel.lastFrame.type = "color"
