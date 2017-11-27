@@ -1,23 +1,14 @@
 --[[
 # Element: Range Fader
-
 Changes the opacity of a unit frame based on whether the frame's unit is in the player's range.
-
 ## Widget
-
 Range - A table containing opacity values.
-
 ## Notes
-
 Offline units are handled as if they are in range.
-
 ## Options
-
 .outsideAlpha - Opacity when the unit is out of range. Defaults to 0.55 (number)[0-1].
 .insideAlpha  - Opacity when the unit is within range. Defaults to 1 (number)[0-1].
-
 ## Examples
-
     -- Register with oUF
     self.Range = {
         insideAlpha = 1,
@@ -33,17 +24,12 @@ local OnRangeFrame
 
 local UnitInRange, UnitIsConnected = UnitInRange, UnitIsConnected
 
--- Some classes have unique spell ranges, like resto druids with chest or a talent.
-local spellCheck = {}
-spellCheck['DRUID'] = select(1, GetSpellInfo(50769))
-
 local function Update(self, event)
 	local element = self.Range
 	local unit = self.unit
 
 	--[[ Callback: Range:PreUpdate()
 	Called before the element has been updated.
-
 	* self - the Range element
 	--]]
 	if(element.PreUpdate) then
@@ -53,21 +39,11 @@ local function Update(self, event)
 	local inRange, checkedRange
 	local connected = UnitIsConnected(unit)
 	if(connected) then
-		-- Support range checking by spell
-		local class = select(2, UnitClass(unit))
-		if (spellCheck[class]) then
-			if (IsSpellInRange(spellCheck[class], unit) == 1) then
-				self:SetAlpha(element.insideAlpha)
-			else
-				self:SetAlpha(element.outsideAlpha)
-			end
+		inRange, checkedRange = UnitInRange(unit)
+		if(checkedRange and not inRange) then
+			self:SetAlpha(element.outsideAlpha)
 		else
-			inRange, checkedRange = UnitInRange(unit)
-			if(checkedRange and not inRange) then
-				self:SetAlpha(element.outsideAlpha)
-			else
-				self:SetAlpha(element.insideAlpha)
-			end
+			self:SetAlpha(element.insideAlpha)
 		end
 	else
 		self:SetAlpha(element.insideAlpha)
@@ -75,7 +51,6 @@ local function Update(self, event)
 
 	--[[ Callback: Range:PostUpdate(object, inRange, checkedRange, isConnected)
 	Called after the element has been updated.
-
 	* self         - the Range element
 	* object       - the parent object
 	* inRange      - indicates if the unit was within 40 yards of the player (boolean)
@@ -90,7 +65,6 @@ end
 local function Path(self, ...)
 	--[[ Override: Range.Override(self, event)
 	Used to completely override the internal update function.
-
 	* self  - the parent object
 	* event - the event triggering the update (string)
 	--]]
